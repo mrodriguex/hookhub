@@ -1,0 +1,30 @@
+﻿.CabeceroFijo {
+    overflow-y: auto;
+    height: calc(100vh - 250px);
+}
+
+    .CabeceroFijo thead th {
+        position: sticky;
+        top: 0;
+    }
+
+.Reportes table {
+    font: 12px 'DejaVu Sans', Arial, sans-serif;
+    border-collapse: collapse;
+    border:none;
+    border-width:0;
+}
+
+    .Reportes table thead th {
+        padding: 5px;
+        background-color: #bccde2;
+        color: #668ab9;
+        text-align: center;
+        vertical-align: middle;
+    }
+
+    .Reportes table td {
+        border: 0.5px solid #bccde2;
+        padding: 5px;
+        vertical-align: middle;
+    }

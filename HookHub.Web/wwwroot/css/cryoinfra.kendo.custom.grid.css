@@ -1,0 +1,630 @@
+﻿/**********************************************************************************
+-- Desde la hoja Estilo_Layout.css 
+**********************************************************************************/
+.k-grid-toolbar {
+    background-color: white;
+    background-image: none;
+    border-style: none;
+}
+
+    .k-grid-toolbar a {
+        border: none;
+    }
+
+.k-grid .k-header .k-button {
+    background-color: white;
+}
+
+.k-grid-header .k-header {
+    position: relative;
+    text-align: center !important;
+    border-color: #dedede;
+}
+
+.k-listbox .k-list-scroller {
+    border-color: #adadad;
+    border-radius: 4px;
+}
+
+li.k-item {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+/*********************************************************************************/
+.form-control {
+    height: auto;
+}
+
+/**********************************************************************************
+-- Desde la hoja Estilo_Cryoinfra.css 
+**********************************************************************************/
+.k-button-ifake {
+    color: #2e2e2e;
+    background-image: none,linear-gradient(to bottom,rgba(255,255,255,.25) 0,rgba(255,255,255,0) 100%);
+    width: 20px;
+    height: 20px;
+    border: none;
+    min-width: 0 !important;
+    border-radius: 0;
+    font: normal normal normal 14px/1 FontAwesome;
+    font-size: inherit;
+    text-rendering: auto;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    display: inline-block;
+    position: relative;
+}
+
+.k-i-button-activo:before {
+    content: url(../images/Activo.png);
+    width: 100%;
+}
+
+.k-i-button-inactivo:before {
+    content: url(../images/Inactivo.png);
+    width: 100%;
+}
+
+.k-i-button-niveles {
+    background-image: url(../images/Usuario.png);
+    background-size: 28px 28px;
+    background-repeat: no-repeat;
+    display: inline-block;
+    width: 32px;
+    height: 32px;
+    content: "";
+}
+
+.k-i-button-upload {
+    background-image: url(../images/Upload.png);
+    background-size: 28px 28px;
+    background-repeat: no-repeat;
+    display: inline-block;
+    width: 32px;
+    height: 32px;
+    content: "";
+}
+
+.k-i-button-pdf {
+    background-image: url(../images/PDF.png);
+    background-size: 28px 28px;
+    background-repeat: no-repeat;
+    display: inline-block;
+    width: 32px;
+    height: 32px;
+    content: "";
+}
+
+.k-i-button-editar:before {
+    content: url(../images/Editar.png);
+}
+
+.k-i-button-editar-actualizar:before {
+    content: url(../images/Aceptar.png);
+}
+
+.k-i-button-editar-cancelar:before {
+    content: url(../images/Cancelar.png);
+}
+
+.k-i-button-eliminar:before {
+    content: url(../images/Eliminar.png);
+}
+
+.k-i-button-add:before {
+    content: url(../images/Nuevo.png);
+}
+
+.k-grid .buttoni {
+    background: url(../images/Nuevo.png) no-repeat center;
+    width: 50px;
+    height: 50px;
+    position: relative;
+    transition: .0s ease-in-out;
+    cursor: pointer;
+    border: 0;
+    outline: none;
+}
+
+    .k-grid .buttoni:before,
+    .k-grid .buttoni:after {
+        background: url(../images/Nuevo.png) no-repeat center;
+        position: absolute;
+        content: '';
+        border: none;
+        transition: .0s ease-in-out;
+        outline: none;
+    }
+
+    .k-grid .buttoni:before {
+        background: none;
+        border-radius: 0%;
+        width: 50px;
+        height: 50px;
+        right: 0px;
+        top: 0px;
+        outline: none;
+    }
+
+    .k-grid .buttoni:after {
+        width: 0;
+        height: 0;
+        display: block;
+        border-left: 0px solid transparent;
+        border-right: 0px solid transparent;
+        border-top: 0px;
+        transform: rotate(-90deg);
+        right: 0px;
+        top: 0px;
+        outline: none;
+    }
+
+    .k-grid .buttoni:hover:before {
+        background: none;
+        outline: none;
+    }
+
+    .k-grid .buttoni:checked {
+        border: 0px none;
+        outline: none;
+    }
+
+
+/*.btnAgregarConceptoPadre {
+    content: url(../images/Nuevo.png);
+    width: 60px;
+    height: 60px;
+    display: flex;
+}*/
+
+.k-i-button-usuario:before {
+    content: url(../images/Usuario.png);
+    /*display: flex;
+    justify-content: flex-end;
+    width: 100%;
+    padding: 0;*/
+}
+
+
+/*.TreeConcefiguracionConceptos .k-in {
+        text-align: right;
+    }*/
+
+/*.demo-section {
+    display: inline-block;
+    font-size: large;
+    vertical-align: middle;
+    text-align: left;
+    margin: 0 2em;
+    max-height: 250px;
+}*/
+
+.k-grid .AddButton {
+    height: 40px;
+    width: 40px;
+    border-style: none;
+    border: none;
+    background-color: none;
+    color: none;
+    background: none;
+    float: right;
+    outline: none;
+}
+
+    .k-grid .AddButton:hover {
+        border: 0px;
+        background-color: none;
+        color: none;
+        background: none;
+        outline: none;
+    }
+
+    .k-grid .AddButton:focus {
+        border: none;
+        outline: none;
+        color: none;
+        background: none;
+        background-color: none;
+    }
+
+.FormatoSwitch {
+    width: 100px;
+}
+
+.k-i-button-editar-upload:before {
+    /*content: url(../images/A.png);*/
+    content: url(../images/Editar.png);
+    /*display: flex;
+    justify-content: left;
+    width: 100%;
+    padding: 0;*/
+}
+
+/*.box:hover .hover {
+    width: 92%;
+}
+
+.boton:before {
+    content: url(../images/upload.png);
+    margin: 0px;
+}*/
+
+/*Centra los controles de filtros de un grid*/
+.k-filtercell > .k-operator-hidden {
+    padding-right: 0;
+}
+
+.k-filtercell > span {
+    padding-right: 2.4em;
+}
+
+.k-filter-row .k-dropdown-operator {
+    right: 0em;
+}
+/*centra los controles de filtros de un grid*/
+
+
+
+/**********************************************************************************
+-- Configuración de grid
+**********************************************************************************/
+
+.k-grid {
+    border-top: 0 !important;
+    border-right: 0 !important;
+    border-left: 0 !important;
+    border-bottom: 0 !important;
+    font: 14px/1.42857143 "Helvetica Neue", Helvetica, Arial, sans-serif;
+    /*border-color: #dedede !important;*/
+}
+
+    .k-grid table {
+        /*border-spacing: 1px !important;*/
+    }
+
+    .k-grid td {
+        border-color: #dedede;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+    }
+
+.k-filter-row {
+    /*border-left-width: 1px;*/
+}
+
+.k-pager-wrap {
+    background-color: whitesmoke;
+}
+
+.k-grid-content .k-button {
+    width: 20px;
+    height: 20px;
+    border: none;
+    min-width: 0 !important;
+    border-radius: 0;
+    display: inline-block;
+    font: normal normal normal 14px/1 FontAwesome;
+    font-size: 12px;
+    text-rendering: auto;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-indent: -5px;
+    position: relative;
+    background-color: transparent;
+}
+
+.k-switch {
+    font-size: 12px;
+}
+
+.k-grid-content {
+    border-left: 1px solid #dedede;
+    border-right: 1px solid #dedede;
+    width: auto !important;
+    text-align: center;
+}
+
+.k-grid tbody tr td {
+    text-align: center !important;
+}
+
+.k-grid-edit-row .k-grid-niveles,
+.k-grid-edit-row .k-grid-subirarchivo,
+.k-grid-edit-row .k-grid-verpdf,
+.k-grid-edit-row .k-grid-detalleTareaPredictiva {
+    visibility: hidden;
+}
+
+.k-grid-excel:before {
+    content: url(../images/Excel.png);
+}
+
+.k-grid-header th:first-child.k-header {
+    -webkit-border-radius: 10px 10px 0px 0px;
+    -moz-border-radius: 10px 10px 0px 0px;
+    border-radius: 10px 10px 0px 0px !important;
+}
+
+.k-grid .k-grid-header .k-header .k-link {
+    height: auto;
+}
+
+.k-grid .k-header .k-link {
+    white-space: normal;
+    text-align: center;
+}
+
+.k-grid-header {
+    text-align: center !important;
+    background-color: whitesmoke;
+    border-color: #dedede;
+    -webkit-border-radius: 10px 10px 0px 0px;
+    -moz-border-radius: 10px 10px 0px 0px;
+    border-radius: 10px 10px 0px 0px !important;
+    border-style: solid solid none solid;
+    border-width: 1px 1px 0px 1px;
+}
+
+.k-grid-pager {
+    border-color: #dedede;
+    border-style: none solid solid solid !important;
+    border-width: 0px 1px 1px 1px;
+    -webkit-border-radius: 0px 0px 10px 10px;
+    -moz-border-radius: 0px 0px 10px 10px;
+    border-radius: 0px 0px 10px 10px;
+}
+
+.k-grid-header-wrap {
+    border-right-style: none;
+}
+
+
+.k-listbox :not(.k-state-disabled).k-item:hover {
+    border-color: #adadad;
+    background-color: #e6e5e5;
+}
+
+.k-list-container {
+    border-color: #e6e5e5;
+    background-color: whitesmoke;
+}
+
+.k-dropdown, .k-filebrowser-dropzone, .k-list {
+    border-color: #e6e5e5;
+    background-color: transparent;
+}
+
+    .k-dropdown .k-state-focused, .k-filebrowser-dropzone, .k-list > .k-state-hover, .k-splitbar-horizontal-hover, .k-splitbar-vertical-hover, .k-state-hover {
+        border-color: #adadad;
+        background-color: #e6e5e5;
+    }
+
+.k-pager-wrap .k-link {
+    border-color: #adadad;
+}
+
+    .k-pager-wrap .k-link:hover {
+        background-color: #e6e6e6;
+        border-color: #adadad;
+    }
+
+    .k-pager-wrap .k-link.k-state-selected {
+        background-color: #337ab7;
+        color: white;
+    }
+
+        .k-pager-wrap .k-link.k-state-selected:hover {
+            background-color: #337ab7;
+            color: white;
+        }
+
+.k-popup, .k-window {
+    -webkit-box-shadow: 0px 1px 4px 0px rgba(0,0,0,0.75);
+    -moz-box-shadow: 0px 1px 4px 0px rgba(0,0,0,0.75);
+    box-shadow: 0px 1px 4px 0px rgba(0,0,0,0.75);
+    border-style: none;
+    background-color: white;
+}
+
+.dropdown-menu {
+    -webkit-box-shadow: 0px 6px 12px rgba(0,0,0,0.175);
+    -moz-box-shadow: 0px 6px 12px rgba(0,0,0,0.175);
+    box-shadow: 0px 6px 12px rgba(0,0,0,0.175);
+    border-style: none;
+    background-color: white;
+}
+
+/** Switch Handle *************************/
+.k-switch-on .k-switch-container {
+    border-color: #93c8df;
+    color: #003f59;
+    background-color: #fff;
+}
+
+.k-switch-container {
+    border-radius: 5em;
+    padding: 2px 2px;
+    border-width: 1px;
+    border-color: cornflowerblue;
+    border-style: solid;
+    -ms-flex: 1 0 auto;
+    flex: 1 0 auto;
+    position: relative;
+    outline: 0;
+    transition: background-color .2s ease-out 0s;
+}
+/***************************************/
+
+/** Switch Handle *************************/
+.k-switch-off .k-switch-handle {
+    border-color: #93c8df;
+    color: #003f59;
+    background-color: #daecf4;
+    background-image: url(textures/highlight.png);
+    background-image: none,linear-gradient(to bottom,rgba(255,255,255,.4) 0,rgba(255,255,255,0) 100%);
+}
+
+.k-switch-handle {
+    border-radius: 5em;
+    width: 1.8em;
+    height: 1.8em;
+    border-width: 1px;
+    border-style: solid;
+    background-position: 50%;
+    display: inline-block;
+    vertical-align: middle;
+    position: relative;
+    left: 0;
+    transition: left .2s ease-out 0s;
+}
+/***************************************/
+
+/** Switch Off *************************/
+.k-switch-off .k-switch-label-on {
+    color: transparent;
+}
+
+.k-switch-label-on {
+    text-align: left;
+    left: 7px;
+}
+
+.k-switch-label-off, .k-switch-label-on {
+    display: inline;
+    width: calc(100% - 2em - 12px);
+    position: absolute;
+    top: 50%;
+    -webkit-transform: translateY(-50%);
+    -ms-transform: translateY(-50%);
+    transform: translateY(-50%);
+    text-shadow: none;
+    line-height: 1.8em;
+    overflow: hidden;
+}
+
+.k-edge .k-switch-on .k-switch-handle, .k-ie .k-switch-on .k-switch-handle {
+    margin-left: -2em;
+}
+/***************************************/
+/** Switch Off *************************/
+.k-switch-on .k-switch-label-off {
+    color: transparent;
+}
+
+.k-switch-label-off {
+    text-align: right;
+    right: 7px;
+}
+
+.k-switch-label-off, .k-switch-label-on {
+    display: inline;
+    width: calc(100% - 2em - 12px);
+    position: absolute;
+    top: 50%;
+    -webkit-transform: translateY(-50%);
+    -ms-transform: translateY(-50%);
+    transform: translateY(-50%);
+    text-shadow: none;
+    line-height: 2em;
+    overflow: hidden;
+}
+/***************************************/
+
+.k-autocomplete, .k-dropdown-wrap.k-state-default, .k-numeric-wrap.k-state-default, .k-picker-wrap.k-state-default {
+    background-color: #e6e5e5;
+}
+
+select, .k-multiselect-wrap, .k-multiselect, .k-editor, .k-editor-widget, .k-textarea, .k-textbox, .k-input, .k-autocomplete, .k-dropdown-wrap.k-state-default, .k-numeric-wrap.k-state-default, .k-picker-wrap.k-state-default, .text-box {
+    border-color: #DDDDDD;
+    border-radius: 4px;
+}
+
+.k-grid tbody tr:hover {
+    background-color: #e6e5e5;
+}
+
+.k-alt, .k-pivot-layout > tbody > tr:first-child > td:first-child, .k-resource.k-alt, .k-separator {
+    background-color: whitesmoke;
+}
+
+/*********************************************************************************/
+
+
+/**********************************************************************************
+-- Desde la hoja kendo.bootstrap-common.min.css 
+**********************************************************************************/
+/*.k-filter-row > th:first-child, .k-grid tbody td:first-child, .k-grid tfoot td:first-child, .k-grid-header th:first-child.k-header {
+    border: none;
+}*/
+
+.k-autocomplete .k-input, .k-dropdown-wrap .k-input, .k-multiselect-wrap .k-input, .k-numeric-wrap .k-input, .k-picker-wrap .k-input, .k-selectbox .k-input, .k-textbox > input, .text-box {
+    line-height: 1.6em;
+}
+
+.k-ie .k-combobox .k-input, .k-ie .k-numeric-wrap .k-input, .k-ie .k-picker-wrap .k-input, .k-ie .k-textbox > input, .text-box {
+    height: 1.95em;
+}
+
+.k-filter-row th {
+    border-style: none;
+    background-color: white;
+}
+
+.k-grid-toolbar, .k-grouping-header {
+    padding-top: 5px;
+    padding-bottom: 0;
+}
+
+.k-menu .k-item, .k-menu-scroll-wrapper .k-item, .k-popups-wrapper .k-item, .k-tabstrip-items .k-item {
+    background-color: white;
+    border-color: #adadad;
+}
+
+.k-group .k-in {
+    border-width: 0;
+    border-radius: 4px;
+}
+
+.k-grid tbody .k-button {
+    min-width: 16px;
+    border: none;
+}
+
+.k-button, .k-content {
+    border-color: #adadad;
+    border-radius: 4px;
+}
+
+.k-context-menu .k-state-default {
+    background-color: white;
+}
+
+.k-context-menu .k-state-hover, .k-popup .k-link:hover {
+    border-color: #adadad;
+    background-color: #e6e5e5;
+}
+/*********************************************************************************/
+/**********************************************************************************
+-- Colores
+**********************************************************************************/
+.k-form-error, .k-invalid-msg, .field-validation-error {
+    background-color: white;
+    color: maroon;
+}
+
+.k-block, .k-content, .k-dropdown .k-input, .k-popup, .k-toolbar, .k-widget, .k-grid-header .k-header > .k-link, .k-header, .k-treemap-title {
+    color: #333;
+}
+
+.k-textarea, .k-textbox {
+    background-color: whitesmoke;
+    border-color: #adadad;
+}
+
+    .k-textarea:hover, .k-textbox:hover {
+        background-color: #e6e5e5;
+        border-color: #adadad;
+    }
+
+/*********************************************************************************/

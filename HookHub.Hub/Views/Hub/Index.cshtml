@@ -1,0 +1,66 @@
+﻿@model HookHub.Hub.Models.CoreHookInfoModel
+
+    <style>
+
+        .pre-scrollable {
+            max-height: calc(100vh - 145px);
+        }
+
+        .controles {
+            height: calc(100vh - 145px);
+        }
+
+    </style>
+
+    <div class="container">
+        <div class="row">&nbsp;&nbsp;</div>
+        <div class="row">
+
+            <div class="col-lg-5 pre-scrollable">
+                <ul id="listUsers"></ul>
+            </div>
+
+            <div class="col-lg-5 pre-scrollable">
+                <ul id="listMessage"></ul>
+            </div>
+
+            <div class="col-lg-2 controles">
+                <div class="row">
+                    <div class="col-12">
+                        <input type="button" id="btnRefreshUsers" value="Refresh" />
+                    </div>
+                </div>
+                <div class="row">&nbsp;&nbsp;</div>
+                <div class="row">
+                    <div class="col-2">HubPath: </div>
+                    <div class="col-4"><input type="text" id="url" value="@Url.Content("~/HOOKHUBNET")" /></div>
+                </div>
+                <div class="row">
+                    <div class="col-2">From user Name: </div>
+                    <div class="col-4"><input type="text" id="hookNameFrom" value="@(Model.HookConnection.HookName)" /></div>
+                </div>
+                <div class="row">
+                    <div class="col-2">To user Name: </div>
+                    <div class="col-4"><input type="text" id="hookNameTo" value="@(Model.HookConnection.HookName)" /></div>
+                </div>
+                <div class="row">
+                    <div class="col-2">Message</div>
+                    <div class="col-4"><input type="text" id="message" value="message" /></div>
+                </div>
+                <div class="row">&nbsp;&nbsp;</div>
+                <div class="row">
+                    <div class="col-6">
+                        <input type="button" id="btnConnect" value="Connect" />
+                    </div>
+                    <div class="col-6">
+                        <input type="button" id="btnSend" value="Send" />
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    @*<script src="~/js/jquery-3.3.1.min.js"></script>*@
+    <script src="~/js/signalr.min.js"></script>
+    <script src="~/js/hub.js"></script>

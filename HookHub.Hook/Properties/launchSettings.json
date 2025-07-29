@@ -1,0 +1,10 @@
+﻿{
+  "profiles": {
+    "HookHub.Hook.Win": {
+      "commandName": "Project",
+      "environmentVariables": {
+        "DOTNET_ENVIRONMENT": "Development"
+      }
+    }
+  }
+}
