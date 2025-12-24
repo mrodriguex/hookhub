@@ -8,7 +8,7 @@
   </PropertyGroup>
 
   <PropertyGroup>
-    <TargetFramework>net5.0</TargetFramework>
+    <TargetFramework>net10.0</TargetFramework>
     <UserSecretsId>dotnet-HookHub.Hook.Win-720C53FC-9DE6-4443-90D9-174E2539AE79</UserSecretsId>
   </PropertyGroup>
 
