@@ -1,15 +1,10 @@
 ﻿using Newtonsoft.Json;
 
-using System;
-using System.Threading.Tasks;
 using HookHub.Core.Models;
-using System.Net.Http;
 using System.Text;
 using System.Net.Http.Headers;
 using HookHub.Core.ContractResolver;
-using System.Linq;
-using System.Collections.Generic;
-using System.Net;
+using System.Net.Security;
 
 namespace HookHub.Core.ViewModels
 {
@@ -18,65 +13,39 @@ namespace HookHub.Core.ViewModels
         public static async Task<object> RequestAsync(NetMessage netMessage)
         {
             object response;
-            switch (netMessage.RequestType)
-            {
-                case NetType.HttpRequestMessage:
-                    netMessage.ResponseType = NetType.HttpResponseMessage;
-                    HookWebRequest solicitudWeb = Deserialize<HookWebRequest>(netMessage.Request);
-                    HookWebResponse deserializedResponse = await ProcesarRequestHttpAsync(solicitudWeb);
-                    response = Serialize(deserializedResponse);
-                    break;
-                case NetType.String:
-                    netMessage.ResponseType = NetType.String;
-                    string requestStr = Deserialize<string>(netMessage.Request);
-                    response = Serialize(requestStr);
-                    break;
-                default:
-                    netMessage.ResponseType = NetType.String;
-                    response = "The request data type is not supported";
-                    break;
-            }
+            netMessage.ResponseType = NetType.HttpResponseMessage;
+            HookWebRequest solicitudWeb = Deserialize<HookWebRequest>(netMessage.Request);
+            HookWebResponse deserializedResponse = await ProcesarRequestHttpAsync(solicitudWeb);
+            response = Serialize(deserializedResponse);
             return (response);
         }
 
         public static async Task<HookWebResponse> ProcesarRequestHttpAsync(HookWebRequest hookWebRequest)
         {
             HookWebResponse hookWebResponse = new HookWebResponse();
-            //hookWebResponse.QueryString = hookWebRequest.QueryString;
             hookWebResponse.HttpMethod = hookWebRequest.HttpMethod;
 
-            string mensajeDevuelto = "";
             try
             {
+
+                var handler = new HttpClientHandler
+                {
+                    ServerCertificateCustomValidationCallback = (sender, cert, chain, sslPolicyErrors) =>
+                    {
+                        if (sslPolicyErrors == SslPolicyErrors.None)
+                            return true;
+                        Console.WriteLine($"Certificate error: {sslPolicyErrors}");
+                        return true;
+                    },
+                    UseDefaultCredentials = false,
+                    AllowAutoRedirect = false,
+                    MaxConnectionsPerServer = 10
+                };
+
+
                 if (!(hookWebRequest is null))
                 {
-                    //bool hayFuncionNombreGET = hookWebRequest.QueryString.Contains("(") && hookWebRequest.QueryString.Contains(")");
-                    ///*** Procesar llamada de función en método GET *****************************************************************/
-                    //if (hayFuncionNombreGET)
-                    //{
-                    //    string[] metodoGETTokens = hookWebRequest.QueryString.Split(new[] { '(', ')' }, StringSplitOptions.RemoveEmptyEntries);
-                    //    bool hayFuncionParamsGET = metodoGETTokens.Length > 1;
-                    //    string funcionNombre = metodoGETTokens[0];
-                    //    string[] funcionParametros = hayFuncionParamsGET ? metodoGETTokens[1].Split(new[] { '\'', ',', '\'' }, StringSplitOptions.RemoveEmptyEntries) : new string[] { };
-
-                    //    switch (funcionNombre)
-                    //    {
-                    //        case "EcoDAC":
-                    //            {
-                    //                mensajeDevuelto = hayFuncionParamsGET ? funcionParametros[0] : "";
-                    //                break;
-                    //            }
-                    //        default:
-                    //            {
-                    //                mensajeDevuelto = "ERROR: La función no está definida";
-                    //                break;
-                    //            }
-                    //    }
-                    //}
-                    ///*****************************************************************************************/
-                    //else
-                    //{
-                    HttpClient client = new HttpClient();
+                    HttpClient client = new HttpClient(handler);
                     client.Timeout = TimeSpan.FromSeconds(512);
 
                     List<string> contentTypes;
@@ -142,7 +111,7 @@ namespace HookHub.Core.ViewModels
                     hookWebResponse.ReasonPhrase = response.ReasonPhrase;
 
                     var byteArray = await response.Content.ReadAsByteArrayAsync();
-                    mensajeDevuelto = JsonConvert.SerializeObject(byteArray);
+                    hookWebResponse.Content = byteArray;
                     hookWebResponse.Headers = response.Content?.Headers.ToDictionary(a => a.Key, a => a.Value.AsEnumerable().ToList());
                     /*****************************************************************************************/
                     //}
@@ -150,10 +119,12 @@ namespace HookHub.Core.ViewModels
             }
             catch (Exception ex)
             {
-                mensajeDevuelto = ex.Message;
+                hookWebResponse.Content = Encoding.UTF8.GetBytes(ex.Message);
+                hookWebResponse.StatusCode = 500;
+                hookWebResponse.IsSuccessStatusCode = false;
+                hookWebResponse.ReasonPhrase = ex.Message;
             }
 
-            hookWebResponse.Content = mensajeDevuelto;
             return (hookWebResponse);
         }
 

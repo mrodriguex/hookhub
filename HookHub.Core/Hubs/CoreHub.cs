@@ -1,13 +1,5 @@
 ﻿using HookHub.Core.Models;
-
 using Microsoft.AspNetCore.SignalR;
-using Microsoft.Extensions.Logging;
-
-using System;
-using System.Collections.Concurrent;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace HookHub.Core.Hubs
 {
@@ -32,7 +24,7 @@ namespace HookHub.Core.Hubs
             }
             catch (Exception ex)
             {
-                LogError(ex.Message);
+                _logger.LogError(ex.Message);
             }
         }
 
@@ -47,7 +39,7 @@ namespace HookHub.Core.Hubs
             }
             catch (Exception ex)
             {
-                LogError(ex.Message);
+                _logger.LogError(ex.Message);
             }
         }
 
@@ -62,11 +54,11 @@ namespace HookHub.Core.Hubs
             List<HookConnection> hookConnections = new List<HookConnection>();
             try
             {
-                hookConnections = HookConnetionsHub.HookConnections.OrderBy(x => Guid.NewGuid()).Select(x => new HookConnection() { HookName = x.Value, ConnectionID = x.Key }).ToList();
+                hookConnections = HookConnetionsHub.HookConnections.OrderBy(x => Guid.NewGuid()).Select(x => new HookConnection() { HookName = x.Value, ConnectionId = x.Key }).ToList();
             }
             catch (Exception ex)
             {
-                LogError(ex.Message);
+                _logger.LogError(ex.Message);
             }
             return (hookConnections);
         }
@@ -77,11 +69,11 @@ namespace HookHub.Core.Hubs
             List<HookConnection> hookConnections = new List<HookConnection>();
             try
             {
-                hookConnections = HookConnetionsHub.HookConnections.OrderBy(x => Guid.NewGuid()).Where(x => x.Value.Equals(hookName)).Select(x => new HookConnection() { HookName = hookName, ConnectionID = x.Key }).ToList();
+                hookConnections = HookConnetionsHub.HookConnections.OrderBy(x => Guid.NewGuid()).Where(x => x.Value.Equals(hookName)).Select(x => new HookConnection() { HookName = hookName, ConnectionId = x.Key }).ToList();
             }
             catch (Exception ex)
             {
-                LogError(ex.Message);
+                _logger.LogError(ex.Message);
             }
             return (hookConnections);
         }
@@ -90,14 +82,14 @@ namespace HookHub.Core.Hubs
         {
             try
             {
-                var connectionIds = GetHookConnections(netMessage.HookConnectionFrom.HookName).Select(x => x.ConnectionID).ToList().AsReadOnly();
+                var connectionIds = GetHookConnections(netMessage.HookConnectionFrom.HookName).Select(x => x.ConnectionId).ToList().AsReadOnly();
                 await Clients.Clients(connectionIds).SendAsync("OnResponse", netMessage);
-                //await CheckForUserConection(netMessage.HookConnectionFrom.ConnectionID, netMessage.HookConnectionFrom.HookName);
-                //await Clients.Client(netMessage.HookConnectionFrom.ConnectionID).SendAsync("OnResponse", netMessage);
+                //await CheckForUserConection(netMessage.HookConnectionFrom.ConnectionId, netMessage.HookConnectionFrom.HookName);
+                //await Clients.Client(netMessage.HookConnectionFrom.ConnectionId).SendAsync("OnResponse", netMessage);
             }
             catch (Exception ex)
             {
-                LogError(ex.Message);
+                _logger.LogError(ex.Message);
             }
         }
 
@@ -105,15 +97,15 @@ namespace HookHub.Core.Hubs
         {
             try
             {
-                await CheckForUserConection(netMessage.HookConnectionTo.ConnectionID, netMessage.HookConnectionTo.HookName);
-                if (string.IsNullOrEmpty(netMessage.HookConnectionTo.ConnectionID))
+                await CheckForUserConection(netMessage.HookConnectionTo.ConnectionId, netMessage.HookConnectionTo.HookName);
+                if (string.IsNullOrEmpty(netMessage.HookConnectionTo.ConnectionId))
                 {
                     netMessage.HookConnectionTo = GetHookConnection(netMessage.HookConnectionTo.HookName);
                 }
 
-                if (!string.IsNullOrEmpty(netMessage.HookConnectionTo.ConnectionID))
+                if (!string.IsNullOrEmpty(netMessage.HookConnectionTo.ConnectionId))
                 {
-                    await Clients.Client(netMessage.HookConnectionTo.ConnectionID).SendAsync("OnRequest", netMessage);
+                    await Clients.Client(netMessage.HookConnectionTo.ConnectionId).SendAsync("OnRequest", netMessage);
                 }
                 else
                 {
@@ -123,24 +115,24 @@ namespace HookHub.Core.Hubs
             }
             catch (Exception ex)
             {
-                LogError(ex.Message);
+                _logger.LogError(ex.Message);
             }
         }
 
-        public override Task OnDisconnectedAsync(Exception exception)
+        public override Task OnDisconnectedAsync(Exception? exception)
         {
             try
             {
-                string connectionID = Context.ConnectionId;
+                string connectionId = Context.ConnectionId;
                 string hookName = "";
-                if (HookConnetionsHub.HookConnections.TryRemove(connectionID, out hookName))
+                if (HookConnetionsHub.HookConnections.TryRemove(connectionId, out hookName))
                 {
-                    Task.Factory.StartNew(async () => await BroadcastMessage("HookHubNet", $"The Hook [{hookName}: {connectionID}] has been disconnected"));
+                    Task.Factory.StartNew(async () => await BroadcastMessage("HookHubNet", $"The Hook [{hookName}: {connectionId}] has been disconnected"));
                 };
             }
             catch (Exception ex)
             {
-                LogError(ex.Message);
+                _logger.LogError(ex.Message);
             }
             return base.OnDisconnectedAsync(exception);
         }
@@ -150,13 +142,13 @@ namespace HookHub.Core.Hubs
             try
             {
                 var httpContext = Context.GetHttpContext();
-                string hookName = httpContext.Request.Query["hookName"];
+                string? hookName = httpContext?.Request?.Query["hookName"];
                 string connectionId = Context.ConnectionId;
-                await CheckForUserConection(connectionId, hookName);
+                await CheckForUserConection(connectionId, hookName??"Unknown Hook");
             }
             catch (Exception ex)
             {
-                LogError(ex.Message);
+                _logger.LogError(ex.Message);
             }
             await base.OnConnectedAsync();
             return;
@@ -173,25 +165,25 @@ namespace HookHub.Core.Hubs
             }
             catch (Exception ex)
             {
-                LogError(ex.Message);
+                _logger.LogError(ex.Message);
             }
             return;
         }
 
 
-        public async Task<string> PurgeDisconnection(string connectionID)
+        public async Task<string> PurgeDisconnection(string connectionId)
         {
             string hookName = "";
             try
             {
-                if (HookConnetionsHub.HookConnections.TryRemove(connectionID, out hookName))
+                if (HookConnetionsHub.HookConnections.TryRemove(connectionId, out hookName))
                 {
-                    await BroadcastMessage("HookHubNet", $"The Hook [{hookName}: {connectionID}] has been purged");
+                    await BroadcastMessage("HookHubNet", $"The Hook [{hookName}: {connectionId}] has been purged");
                 }
             }
             catch (Exception ex)
             {
-                LogError(ex.Message);
+                _logger.LogError(ex.Message);
             }
             return hookName;
         }
@@ -217,14 +209,9 @@ namespace HookHub.Core.Hubs
             }
             catch (Exception ex)
             {
-                LogError(ex.Message);
+                _logger.LogError(ex.Message);
             }
         }
-
-        private void LogError(string message)
-        {
-            Console.Error.WriteLine(message);
-            _logger.LogError(message);
-        }
+        
     }
 }

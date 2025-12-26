@@ -82,7 +82,7 @@ function GetAllHookConnections(event) {
             for (var i = 0; i < numHookConnections; i++) {
                 var hookConnection = hookConnections[i];
                 var li = document.createElement("li");
-                li.textContent = hookConnection.hookName + " :: " + hookConnection.connectionID;
+                li.textContent = hookConnection.hookName + " :: " + hookConnection.connectionId;
                 listUsers.prepend(li);
             }
             sortList(listUsers);

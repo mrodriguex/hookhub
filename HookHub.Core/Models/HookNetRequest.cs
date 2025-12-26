@@ -4,26 +4,26 @@ namespace HookHub.Core.Models
 {
     public class NetMessage
     {
-        private HookConnection _hookConnectionFrom;
-        private HookConnection _hookConnectionTo;
-        private string _connectionResponseId;
+        private HookConnection? _hookConnectionFrom;
+        private HookConnection? _hookConnectionTo;
+        private string? _connectionResponseId;
 
         public HookConnection HookConnectionFrom {
             get {
-                if (_hookConnectionFrom is null) { _hookConnectionFrom = new HookConnection(); }
+                _hookConnectionFrom ??= new HookConnection(); 
                 return (_hookConnectionFrom);
             }
             set { _hookConnectionFrom = value; }
         }
         public HookConnection HookConnectionTo {
             get {
-                if (_hookConnectionTo is null) { _hookConnectionTo = new HookConnection(); }
+                _hookConnectionTo ??= new HookConnection();
                 return (_hookConnectionTo);
             }
             set { _hookConnectionTo = value; }
         }
 
-        public string ConnectionResponseId {
+        public string? ConnectionResponseId {
             get {
                 if (string.IsNullOrEmpty(_connectionResponseId)) { _connectionResponseId = ""; }
                 return (_connectionResponseId);

@@ -1,23 +1,24 @@
-﻿using System;
-using System.Net;
-using System.Net.Sockets;
-
-namespace HookHub.Core.Models
+﻿namespace HookHub.Core.Models
 {
     public class HookConnection
     {
-        public virtual int TimeIntervals_KeepAlive
+
+        int _timeIntervals_KeepAlive;
+
+        private string _hookName = default!;
+        private string _connectionId = default!;
+
+        public int TimeIntervals_KeepAlive
         {
             get
             {
-                int timeIntervals_KeepAlive = 0;
-                int.TryParse(Config.TimeIntervals("KeepAlive"), out timeIntervals_KeepAlive);
-                return timeIntervals_KeepAlive;
+                return Math.Max(_timeIntervals_KeepAlive, 60000);
+            }
+            set
+            {
+                _timeIntervals_KeepAlive = Math.Max(value, 60000);
             }
         }
-
-        private string _hookName;
-        private string _connectionID;
 
         public string HookName
         {
@@ -29,14 +30,14 @@ namespace HookHub.Core.Models
             set { _hookName = value; }
         }
 
-        public string ConnectionID
+        public string ConnectionId
         {
             get
             {
-                _connectionID ??= "";
-                return (_connectionID);
+                _connectionId ??= "";
+                return (_connectionId);
             }
-            set { _connectionID = value; }
+            set { _connectionId = value; }
         }
 
         public DateTime LastKeepAlive

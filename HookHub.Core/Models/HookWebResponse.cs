@@ -7,7 +7,7 @@ namespace HookHub.Core.Models
     public class HookWebResponse
     {
         private string _queryString;
-        private string _content;
+        private byte[] _content;
         private Dictionary<string, List<string>> _headers;
 
         public string QueryString
@@ -30,11 +30,11 @@ namespace HookHub.Core.Models
             set { _headers = value; }
         }
 
-        public string Content
+        public byte[] Content
         {
             get
             {
-                _content ??= "";
+                _content ??= new byte[0];
                 return (_content);
             }
             set { _content = value; }

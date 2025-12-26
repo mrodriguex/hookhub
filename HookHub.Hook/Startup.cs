@@ -1,20 +1,13 @@
-using System;
-
-using HookHub.Web.Data;
-
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.AspNetCore.Server.Kestrel.Core;
-using HookHub.Web.Services;
 using HookHub.Core.Workers;
 
-namespace HookHub.Web
+namespace HookHub.Hook
 {
     public class Startup
     {
@@ -56,9 +49,8 @@ namespace HookHub.Web
 #endif
 
             services.AddSingleton<Worker>();
-            services.AddHostedService(provider => provider.GetService<Worker>());
-            services.AddSingleton<TimedHostedService>();
-            services.AddHostedService(provider => provider.GetService<TimedHostedService>());
+            services.AddHostedService(sp => (Worker)sp.GetRequiredService<Worker>());
+
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
@@ -67,8 +59,6 @@ namespace HookHub.Web
             {
                 app.UseDeveloperExceptionPage();
             }
-
-            //app.UseHttpsRedirection();
 
             app.UseStaticFiles();
             app.UseRouting();
@@ -80,7 +70,7 @@ namespace HookHub.Web
             {
                 endpoints.MapControllerRoute(
                     name: "default",
-                    pattern: "{controller=Consware}/{action=Index}");
+                    pattern: "{controller=Home}/{action=Index}");
                 endpoints.MapControllers();
             });
         }

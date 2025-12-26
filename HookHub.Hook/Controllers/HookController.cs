@@ -1,40 +1,38 @@
 ﻿using System.Threading.Tasks;
-
 using HookHub.Core.Workers;
-
 using Microsoft.AspNetCore.Mvc;
 
-namespace HookHub.Web.Controllers
+namespace HookHub.Hook.Controllers
 {
     public class HookController : Controller
     {
-        private Worker Worker { get; set; }
+        private Worker _worker { get; set; }
         public HookController(Worker worker)
         {
-            Worker = worker;
+            _worker = worker;
         }
 
         public IActionResult Index()
         {
-            return Json(Worker);
+            return Json(_worker.Hook);
         }
 
         public async Task<IActionResult> Restart()
         {
-            await Worker.Restart(System.Threading.CancellationToken.None);
-            return Json(Worker);
+            await _worker.Restart(System.Threading.CancellationToken.None);
+            return Json(_worker.Hook);
         }
 
         public async Task<IActionResult> Start()
         {
-            await Worker.Start();
-            return Json(Worker);
+            await _worker.Start();
+            return Json(_worker.Hook);
         }
 
         public async Task<IActionResult> Stop()
         {
-            await Worker.Stop(System.Threading.CancellationToken.None);
-            return Json(Worker);
+            await _worker.Stop(System.Threading.CancellationToken.None);
+            return Json(_worker.Hook);
         }
     }
 }

@@ -1,22 +1,10 @@
 ﻿using HookHub.Core.Helpers;
-using HookHub.Core.Hooks;
 using HookHub.Core.Models;
-
+using HookHub.Core.Workers;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.WebApiCompatShim;
 using Microsoft.Extensions.Primitives;
 
-using Newtonsoft.Json;
-
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Net.Http;
-using System.Security.Policy;
 using System.Text;
-using System.Threading.Tasks;
-using System.Web.Http.Results;
 
 namespace HookHub.Hub.Controllers
 {
@@ -24,11 +12,13 @@ namespace HookHub.Hub.Controllers
     [Route("[controller]")]
     public class ProxyController : Controller
     {
-        public CoreHook CoreHook { get; set; }
+        private readonly ILogger<ProxyController> _logger;
+        public Worker Worker { get; set; }
 
-        public ProxyController(CoreHook netClient)
+        public ProxyController(Worker worker, ILogger<ProxyController> logger)
         {
-            CoreHook = netClient;
+            Worker = worker;
+            _logger = logger;
         }
 
         public IActionResult Index()
@@ -43,150 +33,88 @@ namespace HookHub.Hub.Controllers
         public ActionResult Proxy(string claveUsuarioDestino, string proxedUrl)
         {
             ActionResult actionResult = NotFound();
-
-            var requestQueryString = Request.QueryString.Value;
-            HttpRequestMessage httpRequestMessage = Request.ToHttpRequestMessage();
-
-            //var clonedRequest = HttpRequestMessageExtensions.CloneHttpRequestMessageAsync(httpRequestMessage).Result;
-
-
-            HookWebRequest hookWebRequest = new HookWebRequest();
-
-            if ((proxedUrl.StartsWith("http:/") && !proxedUrl.StartsWith("http://")) || (proxedUrl.StartsWith("https:/") && !proxedUrl.StartsWith("https://")))
+            try
             {
-                proxedUrl = proxedUrl.Replace("http:/", "http://").Replace("https:/", "https://");
-            }
 
-            hookWebRequest.HookUri = new Uri($"{proxedUrl}{requestQueryString}");
-            hookWebRequest.HubUri = new Uri($"{httpRequestMessage.RequestUri}".Replace($"{hookWebRequest.HookUri}", ""));
-            hookWebRequest.HttpMethod = httpRequestMessage.Method;  // GetHttpMethod( Request.Method);
-            hookWebRequest.Headers = Request.Headers.ToDictionary(a => a.Key, a => a.Value.AsEnumerable().ToList()); //hookWebResponse.Headers = response.Headers.ToDictionary(a => a.Key, a => a.Value);
-            hookWebRequest.Cookies = Request.Cookies.ToList();  // .ToDictionary(a => a.Key, a => a.Value.AsEnumerable().ToList()); //hookWebResponse.Headers = response.Headers.ToDictionary(a => a.Key, a => a.Value);
+                var requestQueryString = Request.QueryString.Value;
+                HttpRequestMessage httpRequestMessage = Request.ToHttpRequestMessage();
 
-            string contentType = Request.ContentType;
+                HookWebRequest hookWebRequest = new HookWebRequest();
 
-            hookWebRequest.Content.Headers = Request.Headers.ToDictionary(a => a.Key, a => a.Value.AsEnumerable().ToList());
-            if (!hookWebRequest.HttpMethod.Equals(HttpMethod.Get))
-            {
-                hookWebRequest.Content.Body = new StreamReader(HttpContext.Request.Body, Encoding.UTF8).ReadToEnd();
-
-                if (HttpContext.Request.HasFormContentType)
+                if ((proxedUrl.StartsWith("http:/") && !proxedUrl.StartsWith("http://")) || (proxedUrl.StartsWith("https:/") && !proxedUrl.StartsWith("https://")))
                 {
-                    hookWebRequest.Content.Form = HttpContext.Request.Form.ToDictionary(x => x.Key, x => x.Value.ToList()).ToList();
+                    proxedUrl = proxedUrl.Replace("http:/", "http://").Replace("https:/", "https://");
                 }
-            }
 
-            HookWebResponse hookWebResponse = EnviarMensajeHook(claveUsuarioDestino, hookWebRequest, NetType.HttpRequestMessage).Result;
+                hookWebRequest.HookUri = new Uri($"{proxedUrl}{requestQueryString}");
+                hookWebRequest.HubUri = new Uri($"{httpRequestMessage.RequestUri}".Replace($"{hookWebRequest.HookUri}", ""));
+                hookWebRequest.HttpMethod = httpRequestMessage.Method;  // GetHttpMethod( Request.Method);
+                hookWebRequest.Headers = Request.Headers.ToDictionary(a => a.Key, a => a.Value.AsEnumerable().ToList()); //hookWebResponse.Headers = response.Headers.ToDictionary(a => a.Key, a => a.Value);
+                hookWebRequest.Cookies = Request.Cookies.ToList();  // .ToDictionary(a => a.Key, a => a.Value.AsEnumerable().ToList()); //hookWebResponse.Headers = response.Headers.ToDictionary(a => a.Key, a => a.Value);
 
-            if (hookWebResponse is not null)
-            {
-                try
+                string contentType = Request.ContentType;
+
+                hookWebRequest.Content.Headers = Request.Headers.ToDictionary(a => a.Key, a => a.Value.AsEnumerable().ToList());
+                if (!hookWebRequest.HttpMethod.Equals(HttpMethod.Get))
                 {
-                    byte[] byteArray = JsonConvert.DeserializeObject<byte[]>(hookWebResponse.Content);
+                    hookWebRequest.Content.Body = new StreamReader(HttpContext.Request.Body, Encoding.UTF8).ReadToEnd();
 
-                    switch ((System.Net.HttpStatusCode)hookWebResponse.StatusCode)
+                    if (HttpContext.Request.HasFormContentType)
                     {
-                        case System.Net.HttpStatusCode.OK:
-                            List<string> contentTypesResponse;
-                            //string contentTypeResponse = "";
-                            hookWebResponse.Headers.TryGetValue("Content-Type", out contentTypesResponse);
-                            contentTypesResponse ??= new List<string>();
-                            string contentTypeResponse = contentTypesResponse.FirstOrDefault() ?? contentType ?? "";
-                            actionResult = File(byteArray, contentTypeResponse);
-                            break;
-                        case System.Net.HttpStatusCode.BadRequest:
-                            actionResult = BadRequest(byteArray);
-                            break;
-                        case System.Net.HttpStatusCode.NotFound:
-                            actionResult = NotFound();
-                            break;
-                        case System.Net.HttpStatusCode.InternalServerError:
-                            actionResult = BadRequest(byteArray);
-                            break;
-                        case System.Net.HttpStatusCode.Unauthorized:
-                            actionResult = Unauthorized(byteArray);
-                            break;
-                        default:
-                            actionResult = NotFound();
-                            break;
+                        hookWebRequest.Content.Form = HttpContext.Request.Form.ToDictionary(x => x.Key, x => x.Value.ToList()).ToList();
                     }
                 }
-                catch (Exception ex)
+
+                HookWebResponse hookWebResponse = EnviarMensajeHook(claveUsuarioDestino, hookWebRequest, NetType.HttpRequestMessage).Result;
+
+                if (hookWebResponse is not null)
                 {
-                    actionResult = BadRequest($"{ex.Message}: {hookWebResponse.Content.ToString()}");
+                    try
+                    {
+                        switch ((System.Net.HttpStatusCode)hookWebResponse.StatusCode)
+                        {
+                            case System.Net.HttpStatusCode.OK:
+                                List<string> contentTypesResponse;
+                                //string contentTypeResponse = "";
+                                hookWebResponse.Headers.TryGetValue("Content-Type", out contentTypesResponse);
+                                contentTypesResponse ??= new List<string>();
+                                string contentTypeResponse = contentTypesResponse.FirstOrDefault() ?? contentType ?? "";
+                                actionResult = File(hookWebResponse.Content, contentTypeResponse);
+                                break;
+                            case System.Net.HttpStatusCode.BadRequest:
+                                actionResult = BadRequest(hookWebResponse.ReasonPhrase);
+                                break;
+                            case System.Net.HttpStatusCode.NotFound:
+                                actionResult = NotFound();
+                                break;
+                            case System.Net.HttpStatusCode.InternalServerError:
+                                actionResult = BadRequest(hookWebResponse.ReasonPhrase);
+                                break;
+                            case System.Net.HttpStatusCode.Unauthorized:
+                                actionResult = Unauthorized(hookWebResponse.ReasonPhrase);
+                                break;
+                            default:
+                                actionResult = NotFound();
+                                break;
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        actionResult = BadRequest($"{ex.Message}: {hookWebResponse.Content.ToString()}");
+                    }
                 }
-            }
-            else
-            {
-                actionResult = NotFound();
-            }
+                else
+                {
+                    actionResult = NotFound();
+                }
 
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex.Message);
+                actionResult = BadRequest($"{ex.Message}");
+            }
             return actionResult;
-        }
-
-
-        //[HttpPost("{claveUsuarioDestino}/{*mensajeWebRecibido}")]
-        //public async Task<ActionResult> ProxyPostAsync(string claveUsuarioDestino, string mensajeWebRecibido)
-        //{
-
-
-        //    HookWebResponse hookWebResponse = EnviarMensajeHook(claveUsuarioDestino, hookWebRequest, NetType.HttpRequestMessage).Result;
-
-        //    byte[] byteArray = JsonConvert.DeserializeObject<byte[]>(hookWebResponse.Content);
-
-        //    switch ((System.Net.HttpStatusCode)hookWebResponse.StatusCode)
-        //    {
-        //        case System.Net.HttpStatusCode.OK:
-        //            List<string> contentTypesResponse;
-        //            string contentTypeResponse = "";
-        //            hookWebResponse.Headers.TryGetValue("Content-Type", out contentTypesResponse);
-        //            contentTypesResponse ??= new List<string>();
-        //            contentTypeResponse = contentTypesResponse.FirstOrDefault() ?? "";
-        //            return File(byteArray, contentTypeResponse);
-        //            break;
-        //        case System.Net.HttpStatusCode.BadRequest:
-        //            return BadRequest(byteArray);
-        //            break;
-        //        case System.Net.HttpStatusCode.NotFound:
-        //            return NotFound();
-        //            break;
-        //        case System.Net.HttpStatusCode.InternalServerError:
-        //            return BadRequest(byteArray);
-        //            break;
-        //        default:
-        //            return NotFound();
-        //            break;
-        //    }
-        //}
-
-        private HttpMethod GetHttpMethod(string method)
-        {
-            HttpMethod httpMethod;
-            switch (Request.Method)
-            {
-                case "POST":
-                    httpMethod = HttpMethod.Post;
-                    break;
-                case "PUT":
-                    httpMethod = HttpMethod.Put;
-                    break;
-                case "DELETE":
-                    httpMethod = HttpMethod.Delete;
-                    break;
-                case "HEAD":
-                    httpMethod = HttpMethod.Head;
-                    break;
-                case "PATCH":
-                    httpMethod = HttpMethod.Patch;
-                    break;
-                case "OPTIONS":
-                    httpMethod = HttpMethod.Options;
-                    break;
-                default:
-                    httpMethod = HttpMethod.Get;
-                    break;
-            }
-            return (httpMethod);
         }
 
         private async Task<HookWebResponse> EnviarMensajeHook(string claveUsuarioDestino, object request, NetType requestType = NetType.HttpRequestMessage)
@@ -194,20 +122,20 @@ namespace HookHub.Hub.Controllers
             HookWebResponse hookWebResponse = new HookWebResponse();
             try
             {
-                hookWebResponse = await CoreHook.SendRequest(hookNameTo: claveUsuarioDestino, request: request, requestType: requestType) as HookWebResponse;
-                //hookWebResponse = JsonConvert.DeserializeObject<HookWebResponse>(respuestaSerializada);
+                hookWebResponse = await Worker.Hook.SendRequest(hookNameTo: claveUsuarioDestino, request: request, requestType: requestType) as HookWebResponse;
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.Message);
-                hookWebResponse.Content = ex.Message;
+                _logger.LogError(ex.Message);
+                hookWebResponse.Content = ex.Message != null ? Encoding.UTF8.GetBytes(ex.Message) : new byte[0];
+                hookWebResponse.StatusCode = 500;
+                hookWebResponse.IsSuccessStatusCode = false;
+                hookWebResponse.ReasonPhrase = ex.Message;                
             }
             return (hookWebResponse);
         }
-
-
-
     }
+    
     public static class HttpRequestMessageExtensions
     {
         public static async Task<HttpRequestMessage> CloneHttpRequestMessageAsync(HttpRequestMessage req)

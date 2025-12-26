@@ -1,13 +1,9 @@
 ﻿using HookHub.Core.Hooks;
 using HookHub.Core.Hubs;
+using HookHub.Core.Workers;
 using HookHub.Hub.Models;
 
 using Microsoft.AspNetCore.Mvc;
-
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace HookHub.Hub.Controllers
 {
@@ -16,17 +12,8 @@ namespace HookHub.Hub.Controllers
     public class HubController : Controller
     {
         private CoreHookInfoModel _netClientInfo;
-        private CoreHook _netClient;
 
-        public CoreHook CoreHook
-        {
-            get
-            {
-                _netClient ??= new CoreHook();
-                return (_netClient);
-            }
-            set { _netClient = value; }
-        }
+        public Worker Worker { get; set; }
 
         public CoreHub CoreHub { get; private set; }
 
@@ -34,15 +21,15 @@ namespace HookHub.Hub.Controllers
         {
             get
             {
-                _netClientInfo ??= new CoreHookInfoModel(CoreHook);
+                _netClientInfo ??= new CoreHookInfoModel(Worker.Hook);
                 return (_netClientInfo);
             }
             set { _netClientInfo = value; }
         }
 
-        public HubController(CoreHub coreHub, CoreHook netClient)
+        public HubController(CoreHub coreHub, Worker worker)
         {
-            CoreHook = netClient;
+            Worker = worker;
             CoreHub = coreHub;
         }
 
@@ -66,10 +53,10 @@ namespace HookHub.Hub.Controllers
             return Json(CoreHub.PurgeDisconnections());
         }
 
-        [HttpGet("{Action}/{connectionID}")]
-        public IActionResult PurgeDisconnection(string connectionID)
+        [HttpGet("{Action}/{connectionId}")]
+        public IActionResult PurgeDisconnection(string connectionId)
         {
-            return Json(CoreHub.PurgeDisconnection(connectionID: connectionID));
+            return Json(CoreHub.PurgeDisconnection(connectionId: connectionId));
         }
     }
 }

@@ -1,32 +1,27 @@
 ﻿using HookHub.Core.Hubs;
-using HookHub.Core.Hooks;
-
-using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Server.Kestrel.Core;
 using Microsoft.AspNetCore.SignalR;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
-
-using System.Net;
+using HookHub.Core.Workers;
 
 namespace HookHub.Hub
 {
-    public class Startup : CoreHook
+    public class Startup
     {
+        private readonly IConfiguration _configuration;
+        private readonly IWebHostEnvironment _environment;
+
+        // Remove ILogger injection from constructor
+        public Startup(IConfiguration configuration, IWebHostEnvironment environment)
+        {
+            _configuration = configuration;
+            _environment = environment;
+        }
+
         public void ConfigureServices(IServiceCollection services)
         {
-            var loggerFactory = LoggerFactory.Create(builder =>
-            {
-                builder.AddConsole();
-            });
-
-            ILogger logger = loggerFactory.CreateLogger<Startup>();
-            logger.LogInformation("El servicio ha iniciado");
-
-            ConnectClientAsync();
+            // If you need logging in ConfigureServices, get it from services
+            // but wait until services are built
+            
             // If using Kestrel:
             services.Configure<KestrelServerOptions>(options =>
             {
@@ -39,41 +34,33 @@ namespace HookHub.Hub
                 options.AllowSynchronousIO = true;
             });
 
-
             services.AddControllers();
             services.AddCors();
-
             services.AddOptions();
-
-
             services.AddRazorPages();
             services.AddSignalR();
 
-            services.AddSingleton<CoreHook>(this);
-            services.AddSingleton<CoreHub>();
+            services.AddSingleton<Worker>();
+            services.AddHostedService(sp => sp.GetRequiredService<Worker>());
+
+            services.AddScoped<CoreHub>();
 
             services.Configure<HubOptions>(options =>
             {
-                options.EnableDetailedErrors = true; 
+                options.EnableDetailedErrors = true;
                 options.MaximumReceiveMessageSize = null;
             });
-            var mvcBuilder = services.AddControllersWithViews();
 
 #if DEBUG
-            mvcBuilder.AddRazorRuntimeCompilation();
+            services.AddControllersWithViews();
 #endif
-
         }
 
-        private async void ConnectClientAsync()
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, ILogger<Startup> logger)
         {
-            await Connect();
-        }
+            // Now you can get ILogger here - DI is fully configured
+            logger.LogInformation("Configuring application pipeline...");
 
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
-        {
-            ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
-            //app.UseWebSockets();
             app.UseStaticFiles();
 
             if (env.IsDevelopment())
@@ -89,6 +76,7 @@ namespace HookHub.Hub
 
             app.UseRouting();
             app.UseAuthorization();
+            
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllerRoute(
@@ -98,7 +86,8 @@ namespace HookHub.Hub
                 endpoints.MapHub<CoreHub>("/HOOKHUBNET");
                 endpoints.MapControllers();
             });
-        }
 
+            logger.LogInformation("Application pipeline configured successfully");
+        }
     }
 }
