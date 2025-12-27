@@ -5,23 +5,40 @@ using HookHub.Core.Workers;
 
 namespace HookHub.Hub
 {
+    /// <summary>
+    /// Configures services and the HTTP request pipeline for the HookHub.Hub web application.
+    /// Sets up SignalR hub, CORS, and other middleware for the hub service.
+    /// </summary>
     public class Startup
     {
+        /// <summary>
+        /// The application configuration.
+        /// </summary>
         private readonly IConfiguration _configuration;
+
+        /// <summary>
+        /// The web hosting environment.
+        /// </summary>
         private readonly IWebHostEnvironment _environment;
 
-        // Remove ILogger injection from constructor
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Startup"/> class.
+        /// </summary>
+        /// <param name="configuration">The application configuration.</param>
+        /// <param name="environment">The web hosting environment.</param>
         public Startup(IConfiguration configuration, IWebHostEnvironment environment)
         {
             _configuration = configuration;
             _environment = environment;
         }
 
+        /// <summary>
+        /// Configures services for the application.
+        /// Adds controllers, SignalR, CORS, and the Worker background service.
+        /// </summary>
+        /// <param name="services">The service collection to configure.</param>
         public void ConfigureServices(IServiceCollection services)
         {
-            // If you need logging in ConfigureServices, get it from services
-            // but wait until services are built
-            
             // If using Kestrel:
             services.Configure<KestrelServerOptions>(options =>
             {
@@ -56,6 +73,13 @@ namespace HookHub.Hub
 #endif
         }
 
+        /// <summary>
+        /// Configures the HTTP request pipeline.
+        /// Sets up middleware, routing, and SignalR hub mapping.
+        /// </summary>
+        /// <param name="app">The application builder.</param>
+        /// <param name="env">The web hosting environment.</param>
+        /// <param name="logger">The logger for logging configuration steps.</param>
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env, ILogger<Startup> logger)
         {
             // Now you can get ILogger here - DI is fully configured

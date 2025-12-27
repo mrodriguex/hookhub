@@ -4,12 +4,18 @@ using System.Net.Http;
 
 namespace HookHub.Core.Models
 {
+    /// <summary>
+    /// Represents a web response from a hook, including status, headers, and content.
+    /// </summary>
     public class HookWebResponse
     {
         private string _queryString;
         private byte[] _content;
         private Dictionary<string, List<string>> _headers;
 
+        /// <summary>
+        /// Gets or sets the query string of the response.
+        /// </summary>
         public string QueryString
         {
             get
@@ -20,6 +26,9 @@ namespace HookHub.Core.Models
             set { _queryString = value; }
         }
 
+        /// <summary>
+        /// Gets or sets the headers as a dictionary of header names to lists of values.
+        /// </summary>
         public Dictionary<string, List<string>> Headers
         {
             get
@@ -30,6 +39,9 @@ namespace HookHub.Core.Models
             set { _headers = value; }
         }
 
+        /// <summary>
+        /// Gets or sets the content as a byte array.
+        /// </summary>
         public byte[] Content
         {
             get
@@ -40,11 +52,29 @@ namespace HookHub.Core.Models
             set { _content = value; }
         }
 
+        /// <summary>
+        /// Gets or sets the HTTP method associated with the response.
+        /// </summary>
         public HttpMethod HttpMethod { get; set; } = HttpMethod.Get;
+
+        /// <summary>
+        /// Gets or sets the HTTP status code.
+        /// </summary>
         public int StatusCode { get; set; }
+
+        /// <summary>
+        /// Gets or sets the reason phrase for the status code.
+        /// </summary>
         public string ReasonPhrase { get; set; }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether the status code indicates success.
+        /// </summary>
         public bool IsSuccessStatusCode { get; set; }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="HookWebResponse"/> class.
+        /// </summary>
         public HookWebResponse()
         {
         }

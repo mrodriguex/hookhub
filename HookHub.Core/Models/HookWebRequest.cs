@@ -6,6 +6,9 @@ using System.Net.Http;
 
 namespace HookHub.Core.Models
 {
+    /// <summary>
+    /// Represents a web request to be proxied or sent between hooks, including URI, headers, content, and cookies.
+    /// </summary>
     public class HookWebRequest
     {
         private string _queryString;
@@ -27,6 +30,9 @@ namespace HookHub.Core.Models
         //    set { _queryString = value; }
         //}
 
+        /// <summary>
+        /// Gets or sets the headers as a dictionary of header names to lists of values.
+        /// </summary>
         public Dictionary<string, List<string>> Headers
         {
             get
@@ -37,6 +43,9 @@ namespace HookHub.Core.Models
             set { _headers = value; }
         }
 
+        /// <summary>
+        /// Gets or sets the content of the request.
+        /// </summary>
         public HookWebContent Content
         {
             get
@@ -47,8 +56,14 @@ namespace HookHub.Core.Models
             set { _content = value; }
         }
 
+        /// <summary>
+        /// Gets or sets the HTTP method of the request.
+        /// </summary>
         public HttpMethod HttpMethod { get; set; }
 
+        /// <summary>
+        /// Gets or sets the cookies as a list of key-value pairs.
+        /// </summary>
         public List<KeyValuePair<string, string>> Cookies
         {
             get
@@ -59,9 +74,19 @@ namespace HookHub.Core.Models
             set { _cookies = value; }
         }
 
+        /// <summary>
+        /// Gets or sets the URI of the hook target.
+        /// </summary>
         public Uri HookUri { get; set; }
+
+        /// <summary>
+        /// Gets or sets the URI of the hub.
+        /// </summary>
         public Uri HubUri { get; set; }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="HookWebRequest"/> class.
+        /// </summary>
         public HookWebRequest()
         {
         }

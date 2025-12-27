@@ -9,8 +9,15 @@ using HookHub.Core.Workers;
 
 namespace HookHub.Hook
 {
+    /// <summary>
+    /// Configures services and the HTTP request pipeline for the HookHub.Hook web application.
+    /// </summary>
     public class Startup
     {
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Startup"/> class.
+        /// </summary>
+        /// <param name="configuration">The application configuration.</param>
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
@@ -23,8 +30,16 @@ namespace HookHub.Hook
             logger.LogInformation("El servicio ha iniciado");
         }
 
+        /// <summary>
+        /// Gets the application configuration.
+        /// </summary>
         public IConfiguration Configuration { get; }
 
+        /// <summary>
+        /// Configures services for the application.
+        /// Adds controllers, MVC, and the Worker background service.
+        /// </summary>
+        /// <param name="services">The service collection to configure.</param>
         public void ConfigureServices(IServiceCollection services)
         {
             // If using Kestrel:
@@ -53,6 +68,11 @@ namespace HookHub.Hook
 
         }
 
+        /// <summary>
+        /// Configures the HTTP request pipeline.
+        /// </summary>
+        /// <param name="app">The application builder.</param>
+        /// <param name="env">The web hosting environment.</param>
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
             if (env.IsDevelopment())

@@ -26,6 +26,7 @@ HookHub is a distributed communication platform that allows multiple services (c
 - Connection monitoring and management
 - RESTful API endpoints for hook management
 - Web-based monitoring dashboard
+- Comprehensive XML documentation for all source code
 
 ## Features
 
@@ -90,7 +91,6 @@ HookHub/
 │   ├── Controllers/
 │   │   ├── HomeController.cs            # Home page controller
 │   │   ├── HubController.cs             # Hub management API endpoints
-│   │   ├── MensajeController.cs         # Message handling controller
 │   │   └── ProxyController.cs           # Proxy request routing
 │   ├── Models/
 │   │   ├── CoreHookInfoModel.cs         # Hub-specific hook information model
@@ -362,31 +362,90 @@ GET /Hub/Index
 
 #### ProxyController (HookHub.Hub)
 
-The ProxyController allows you to route HTTP requests through the hub to a target hook service. This is useful for forwarding requests, aggregating data, or implementing custom proxy logic between services.
+The ProxyController acts as a reverse proxy, routing HTTP requests from clients to connected hook services through the hub. This enables:
 
-**Example Usage:**
+- **Request Forwarding**: Forward HTTP requests (GET, POST, PUT, DELETE) to target hooks
+- **Header Preservation**: Maintains original request headers, cookies, and body content
+- **Response Handling**: Returns hook responses with appropriate HTTP status codes
+- **Content-Type Support**: Handles various content types including JSON, form data, and binary content
 
+**Supported HTTP Methods:**
+- GET, POST, PUT, DELETE
+
+**Endpoint Pattern:**
 ```
-GET /Proxy/{HookNameTo}/{TargetUrl}
+{HTTP_METHOD} /Proxy/{HookNameTo}/{TargetUrl}
 ```
 
-Where:
-- `{HookNameTo}` is the name of the destination hook (e.g., `Hook-mrcamacho`)
-- `{TargetUrl}` is the full URL to proxy (e.g., `http://localhost:5200/hook/index`)
+**Parameters:**
+- `{HookNameTo}`: The destination hook name (e.g., `Hook-mrcamacho`)
+- `{TargetUrl}`: The full URL to proxy to the hook service
 
-**Sample Request:**
+**Examples:**
 
-```
+```bash
+# Get hook status
 GET http://localhost:5100/Proxy/Hook-mrcamacho/http://localhost:5200/hook/index
+
+# Post data to hook
+POST http://localhost:5100/Proxy/Hook-mrcamacho/http://localhost:5200/api/data
+Content-Type: application/json
+{
+  "key": "value"
+}
+
+# Forward with query parameters
+GET http://localhost:5100/Proxy/Hook-mrcamacho/http://localhost:5200/api/search?q=test&page=1
 ```
 
-You can use any HTTP method (GET, POST, PUT, DELETE) with the same pattern:
+**Response Handling:**
+- **200 OK**: Successful response from hook
+- **400 Bad Request**: Invalid request or hook error
+- **404 Not Found**: Hook not found or target URL not available
+- **500 Internal Server Error**: Hook service error
 
-```
-POST http://localhost:5100/Proxy/Hook-mrcamacho/http://localhost:5200/hook/index
+**Features:**
+- Automatic URL correction for protocol prefixes
+- Form data and file upload support
+- Cookie forwarding
+- Comprehensive error logging
+
+#### HttpRequestMessageExtensions
+
+Utility class providing extension methods for HttpRequestMessage:
+
+```csharp
+/// <summary>
+/// Extension methods for HttpRequestMessage to support cloning.
+/// </summary>
+public static class HttpRequestMessageExtensions
+{
+    /// <summary>
+    /// Clones an HttpRequestMessage asynchronously, including headers, content, and properties.
+    /// </summary>
+    public static async Task<HttpRequestMessage> CloneHttpRequestMessageAsync(HttpRequestMessage req)
+    // Implementation...
+}
 ```
 
-Query strings and request bodies are forwarded to the target hook. The response from the hook is returned to the client.
+#### HttpResponseMessageResult
+
+Custom IActionResult for returning HttpResponseMessage in MVC actions:
+
+```csharp
+/// <summary>
+/// ActionResult implementation that returns an HttpResponseMessage.
+/// Allows MVC actions to return HttpResponseMessage directly.
+/// </summary>
+public class HttpResponseMessageResult : IActionResult
+{
+    /// <summary>
+    /// Executes the result asynchronously, copying the response to the HTTP context.
+    /// </summary>
+    public async Task ExecuteResultAsync(ActionContext context)
+    // Implementation...
+}
+```
   - Get current hub information
 
 GET /Hub/GetAllHookConnections
@@ -476,6 +535,55 @@ Client-side SignalR connection wrapper with automatic reconnection and message h
 
 Background service that manages hook lifecycle and connection state.
 
+## Code Documentation
+
+All source code files in the HookHub.Hook and HookHub.Hub projects have been thoroughly documented with XML comments following standard C# documentation conventions. This includes:
+
+### Documented Components
+
+- **Classes**: Purpose, responsibilities, and key behaviors
+- **Methods**: Functionality, parameters, return values, and exceptions
+- **Properties**: Purpose and data types
+- **Constructors**: Initialization parameters and dependencies
+- **Extension Methods**: Usage and behavior
+
+### Documentation Standards
+
+- **XML Comments**: All public members include `<summary>`, `<param>`, `<returns>`, and `<exception>` tags where applicable
+- **Class-Level Comments**: Describe the overall purpose and responsibilities
+- **Method-Level Comments**: Explain what the method does, its parameters, and return behavior
+- **Inline Comments**: Used for complex logic or non-obvious code sections
+
+### Benefits
+
+- **IntelliSense Support**: IDEs can display documentation when hovering over methods/properties
+- **API Documentation Generation**: Tools like DocFX can generate comprehensive API docs
+- **Code Maintainability**: Clear documentation helps developers understand and maintain the codebase
+- **Onboarding**: New developers can quickly understand the system architecture and components
+
+### Example Documentation
+
+```csharp
+/// <summary>
+/// API controller for managing the hub service and hook connections.
+/// Provides endpoints to view hub status, manage hook connections, and purge disconnections.
+/// </summary>
+[ApiController]
+[Route("[controller]")]
+public class HubController : Controller
+{
+    /// <summary>
+    /// Gets all current hook connections.
+    /// </summary>
+    /// <returns>JSON array of all hook connections.</returns>
+    [HttpGet("{Action}")]
+    public IActionResult GetAllHookConnections()
+    {
+        return Json(CoreHub.GetAllHookConnections());
+    }
+}
+```
+
 ## NuGet Dependencies
 
 | Package | Version | Purpose |
@@ -520,6 +628,15 @@ All projects use:
 - **Target Framework**: .NET 10.0
 - **Language Version**: Latest C# with implicit usings enabled
 - **Nullable Reference Types**: Enabled
+- **Documentation**: Comprehensive XML comments on all public members
+
+### Code Documentation Standards
+
+The codebase follows strict documentation standards:
+- All public classes, methods, and properties include XML documentation comments
+- IntelliSense-friendly descriptions with `<summary>`, `<param>`, and `<returns>` tags
+- Clear explanations of complex logic and business rules
+- Consistent formatting and terminology throughout the codebase
 
 ### Building with Visual Studio
 
@@ -550,6 +667,6 @@ https://gitlab.com/mrodriguex00/hookhub
 
 ---
 
-**Last Updated**: December 2025
+**Last Updated**: December 27, 2025
 **Framework**: .NET 10.0
 **License**: See individual component licenses

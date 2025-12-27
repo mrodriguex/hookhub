@@ -8,14 +8,40 @@ using Microsoft.AspNetCore.Http.Connections;
 
 namespace HookHub.Core.Hooks
 {
+    /// <summary>
+    /// Client-side SignalR connection wrapper for hooks.
+    /// Manages connection to the hub, message handling, and request/response cycles.
+    /// </summary>
     public class CoreHook
     {
+        /// <summary>
+        /// Logger instance for logging operations and errors.
+        /// </summary>
         private readonly ILogger<CoreHook> _logger;
+
+        /// <summary>
+        /// Configuration instance for accessing app settings.
+        /// </summary>
         private readonly IConfiguration _configuration;
+
+        /// <summary>
+        /// The SignalR hub connection.
+        /// </summary>
         private HubConnection _connection;
+
+        /// <summary>
+        /// The hook connection metadata.
+        /// </summary>
         private HookConnection _hookConnection;
+
+        /// <summary>
+        /// Dictionary for tracking response completion sources.
+        /// </summary>
         public ConcurrentDictionary<string, TaskCompletionSource<object>> _connectionResponses;
 
+        /// <summary>
+        /// Gets or sets the dictionary for tracking response completion sources.
+        /// </summary>
         public ConcurrentDictionary<string, TaskCompletionSource<object>> ConnectionResponses
         {
             get
@@ -29,8 +55,14 @@ namespace HookHub.Core.Hooks
             }
         }
 
+        /// <summary>
+        /// Gets the hub URL from configuration.
+        /// </summary>
         public string HookHubNetURL { get { return _configuration["URLs:HookHubNetURL"] ?? ""; } }
 
+        /// <summary>
+        /// Gets or sets the SignalR hub connection.
+        /// </summary>
         public HubConnection Connection
         {
             get
@@ -46,6 +78,9 @@ namespace HookHub.Core.Hooks
             set { _connection = value; }
         }
 
+        /// <summary>
+        /// Gets or sets the hook connection metadata.
+        /// </summary>
         public HookConnection HookConnection
         {
             get
@@ -60,6 +95,11 @@ namespace HookHub.Core.Hooks
             set { _hookConnection = value; }
         }
 
+        /// <summary>
+        /// Constructor. Initializes the hook with logger and configuration, and starts connection.
+        /// </summary>
+        /// <param name="logger">The logger instance.</param>
+        /// <param name="configuration">The configuration instance.</param>
         public CoreHook(ILogger<CoreHook> logger, IConfiguration configuration)
         {
             _logger = logger;
@@ -67,11 +107,18 @@ namespace HookHub.Core.Hooks
             ConnectAsync();
         }
 
+        /// <summary>
+        /// Initiates the connection asynchronously.
+        /// </summary>
         public async void ConnectAsync()
         {
             await Connect();
         }
 
+        /// <summary>
+        /// Establishes the connection to the hub and sets up event handlers.
+        /// </summary>
+        /// <returns>A task representing the asynchronous operation.</returns>
         public async Task Connect()
         {
             Connection.On<string, string, string>("OnClientReceiveMessage", OnClientReceiveMessage);
@@ -99,16 +146,32 @@ namespace HookHub.Core.Hooks
         /*********************************************************/
         /*** CLIENT LISTENERS ************************************/
         /*********************************************************/
+
+        /// <summary>
+        /// Handles incoming direct messages from other hooks.
+        /// </summary>
+        /// <param name="hookNameFrom">The sender hook name.</param>
+        /// <param name="hookNameTo">The recipient hook name.</param>
+        /// <param name="message">The message content.</param>
         protected virtual void OnClientReceiveMessage(string hookNameFrom, string hookNameTo, string message)
         {
             _logger.LogInformation($"{hookNameFrom} -> {hookNameTo} : {message}");
         }
 
+        /// <summary>
+        /// Handles incoming broadcast messages.
+        /// </summary>
+        /// <param name="hookNameFrom">The sender hook name.</param>
+        /// <param name="message">The broadcast message.</param>
         protected virtual void OnClientReceiveBroadcast(string hookNameFrom, string message)
         {
             _logger.LogInformation($"{hookNameFrom} -> HookHubNet : {message}");
         }
 
+        /// <summary>
+        /// Handles incoming response messages.
+        /// </summary>
+        /// <param name="netMessage">The response NetMessage.</param>
         private void OnResponse(NetMessage netMessage)
         {
             try
@@ -131,6 +194,10 @@ namespace HookHub.Core.Hooks
             }
         }
 
+        /// <summary>
+        /// Handles incoming request messages.
+        /// </summary>
+        /// <param name="netMessage">The request NetMessage.</param>
         private async void OnRequest(NetMessage netMessage)
         {
             try
@@ -160,6 +227,12 @@ namespace HookHub.Core.Hooks
         /*********************************************************/
         /*** WAITING THREADS *************************************/
         /*********************************************************/
+
+        /// <summary>
+        /// Keeps the hook running for a specified timeout period.
+        /// </summary>
+        /// <param name="timeOutMillis">The timeout in milliseconds.</param>
+        /// <returns>A task representing the asynchronous operation.</returns>
         public async Task StayRunning(int timeOutMillis)
         {
             try
@@ -175,6 +248,12 @@ namespace HookHub.Core.Hooks
             return;
         }
 
+        /// <summary>
+        /// Waits for a reverse response to a sent request.
+        /// </summary>
+        /// <param name="netMessage">The NetMessage for the request.</param>
+        /// <param name="timeOutMillis">The timeout in milliseconds.</param>
+        /// <returns>A task representing the asynchronous operation.</returns>
         private async Task WaitForReverseResponse(NetMessage netMessage, int timeOutMillis)
         {
             try
@@ -213,6 +292,13 @@ namespace HookHub.Core.Hooks
         /*** CLIENT METHODS **************************************/
         /*********************************************************/
 
+        /// <summary>
+        /// Sends a direct message to another hook.
+        /// </summary>
+        /// <param name="hookNameFrom">The sender hook name.</param>
+        /// <param name="hookNameTo">The recipient hook name.</param>
+        /// <param name="message">The message content.</param>
+        /// <returns>A task representing the asynchronous operation.</returns>
         public async Task SendMessage(string hookNameFrom, string hookNameTo, string message)
         {
             try
@@ -226,6 +312,13 @@ namespace HookHub.Core.Hooks
             }
         }
 
+        /// <summary>
+        /// Sends a request to another hook and waits for response.
+        /// </summary>
+        /// <param name="hookNameTo">The target hook name.</param>
+        /// <param name="request">The request object.</param>
+        /// <param name="requestType">The type of request.</param>
+        /// <returns>The response object.</returns>
         public async Task<object> SendRequest(string hookNameTo, object request, NetType requestType = 0)
         {
             NetMessage netMessage = new NetMessage();
@@ -262,6 +355,11 @@ namespace HookHub.Core.Hooks
         /*********************************************************/
         /*********************************************************/
 
+        /// <summary>
+        /// Sends an error response back to the hub.
+        /// </summary>
+        /// <param name="netMessage">The NetMessage with error response.</param>
+        /// <returns>A task representing the asynchronous operation.</returns>
         private async Task SendResponseError(NetMessage netMessage)
         {
             try
@@ -273,6 +371,6 @@ namespace HookHub.Core.Hooks
                 _logger.LogError("Error in Hook thread waiting: " + ex.Message);
             }
         }
-        
+
     }
 }

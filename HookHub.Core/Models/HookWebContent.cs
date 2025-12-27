@@ -6,12 +6,18 @@ using System.Net.Http;
 
 namespace HookHub.Core.Models
 {
+    /// <summary>
+    /// Represents the content of a web request or response, including headers, body, and form data.
+    /// </summary>
     public class HookWebContent
     {
         private Dictionary<string, List<string>> _headers;
         private string _body;
         private List<KeyValuePair<string, List<string>>> _form;
 
+        /// <summary>
+        /// Gets or sets the headers as a dictionary of header names to lists of values.
+        /// </summary>
         public Dictionary<string, List<string>> Headers
         {
             get
@@ -21,6 +27,10 @@ namespace HookHub.Core.Models
             }
             set { _headers = value; }
         }
+
+        /// <summary>
+        /// Gets or sets the body content as a string.
+        /// </summary>
         public string Body
         {
             get
@@ -31,6 +41,9 @@ namespace HookHub.Core.Models
             set { _body = value; }
         }
 
+        /// <summary>
+        /// Gets or sets the form data as a list of key-value pairs.
+        /// </summary>
         public List<KeyValuePair<string, List<string>>> Form
         {
             get

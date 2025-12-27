@@ -8,8 +8,16 @@ using System.Net.Security;
 
 namespace HookHub.Core.ViewModels
 {
+    /// <summary>
+    /// Provides static methods for handling web requests, responses, encoding, and serialization in the HookHub system.
+    /// </summary>
     public static class HookHubMessage
     {
+        /// <summary>
+        /// Processes a network message by deserializing the request, processing it asynchronously, and serializing the response.
+        /// </summary>
+        /// <param name="netMessage">The network message containing the request details.</param>
+        /// <returns>A task that represents the asynchronous operation, containing the serialized response object.</returns>
         public static async Task<object> RequestAsync(NetMessage netMessage)
         {
             object response;
@@ -20,6 +28,11 @@ namespace HookHub.Core.ViewModels
             return (response);
         }
 
+        /// <summary>
+        /// Processes an HTTP web request asynchronously, handling different content types and proxying the request.
+        /// </summary>
+        /// <param name="hookWebRequest">The web request to process.</param>
+        /// <returns>A task that represents the asynchronous operation, containing the web response.</returns>
         public static async Task<HookWebResponse> ProcesarRequestHttpAsync(HookWebRequest hookWebRequest)
         {
             HookWebResponse hookWebResponse = new HookWebResponse();
@@ -128,6 +141,11 @@ namespace HookHub.Core.ViewModels
             return (hookWebResponse);
         }
 
+        /// <summary>
+        /// Encodes a string from UTF-8 to ASCII.
+        /// </summary>
+        /// <param name="value">The string to encode.</param>
+        /// <returns>The ASCII-encoded string.</returns>
         public static string Encode(string value)
         {
             ASCIIEncoding ascii = new ASCIIEncoding();
@@ -137,6 +155,11 @@ namespace HookHub.Core.ViewModels
             return (result);
         }
 
+        /// <summary>
+        /// Encodes a list of strings from UTF-8 to ASCII.
+        /// </summary>
+        /// <param name="value">The list of strings to encode.</param>
+        /// <returns>An enumerable of ASCII-encoded strings.</returns>
         public static IEnumerable<string> Encode(List<string> value)
         {
             List<string> result = new List<string>();
@@ -144,6 +167,12 @@ namespace HookHub.Core.ViewModels
             return (result);
         }
 
+        /// <summary>
+        /// Deserializes a JSON string to the specified type using custom settings.
+        /// </summary>
+        /// <typeparam name="T">The type to deserialize to.</typeparam>
+        /// <param name="response">The object to deserialize.</param>
+        /// <returns>The deserialized object of type T.</returns>
         internal static T Deserialize<T>(object response)
         {
             T responseDeserialized = JsonConvert.DeserializeObject<T>(response.ToString(), new JsonSerializerSettings()
@@ -155,6 +184,11 @@ namespace HookHub.Core.ViewModels
             return (responseDeserialized);
         }
 
+        /// <summary>
+        /// Serializes an object to a JSON string using custom settings.
+        /// </summary>
+        /// <param name="request">The object to serialize.</param>
+        /// <returns>The JSON string representation of the object.</returns>
         internal static string Serialize(object request)
         {
             string requestSerialized = JsonConvert.SerializeObject(request, Formatting.Indented, new JsonSerializerSettings()

@@ -4,12 +4,30 @@ using Microsoft.AspNetCore.SignalR.Client;
 
 namespace HookHub.Core.Workers
 {
+    /// <summary>
+    /// Background service that manages the lifecycle and connection state of a hook.
+    /// Handles keep-alive messages, reconnection, and hook operations.
+    /// </summary>
     public class Worker : BackgroundService
     {
+        /// <summary>
+        /// Logger instance for logging operations and errors.
+        /// </summary>
         private readonly ILogger<Worker> _logger;
+
+        /// <summary>
+        /// Configuration instance for accessing app settings.
+        /// </summary>
         private readonly IConfiguration _configuration;
+
+        /// <summary>
+        /// The CoreHook instance managed by this worker.
+        /// </summary>
         public CoreHook Hook { get; set; }
 
+        /// <summary>
+        /// Gets the current connection state of the hub.
+        /// </summary>
         public HubConnectionState HubConnectionState
         {
             get
@@ -19,6 +37,11 @@ namespace HookHub.Core.Workers
             }
         }
 
+        /// <summary>
+        /// Constructor. Initializes the worker with logger and configuration, and creates the CoreHook.
+        /// </summary>
+        /// <param name="logger">The logger instance.</param>
+        /// <param name="configuration">The configuration instance.</param>
         public Worker(ILogger<Worker> logger, IConfiguration configuration)
         {
             _logger = logger;
@@ -28,6 +51,11 @@ namespace HookHub.Core.Workers
             Hook = new CoreHook(logger: loggerCoreHook, configuration: _configuration);
         }
 
+        /// <summary>
+        /// Executes the background service loop, maintaining the hook connection and sending keep-alive messages.
+        /// </summary>
+        /// <param name="stoppingToken">Cancellation token to stop the service.</param>
+        /// <returns>A task representing the asynchronous operation.</returns>
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {            
             _logger.LogInformation("{time} : Initializing the Hook...", DateTimeOffset.Now);
@@ -51,12 +79,22 @@ namespace HookHub.Core.Workers
             await this.StopAsync(stoppingToken);   
         }
 
+        /// <summary>
+        /// Restarts the hook service.
+        /// </summary>
+        /// <param name="stoppingToken">Cancellation token.</param>
+        /// <returns>A task representing the asynchronous operation.</returns>
         public async Task Restart(CancellationToken stoppingToken)
         {
             await Stop(stoppingToken);
             await Start();
         }
 
+        /// <summary>
+        /// Stops the hook service and disposes the connection.
+        /// </summary>
+        /// <param name="stoppingToken">Cancellation token.</param>
+        /// <returns>A task representing the asynchronous operation.</returns>
         public async Task Stop(CancellationToken stoppingToken)
         {
             _logger.LogInformation("Finishing the Hook...");
@@ -69,6 +107,10 @@ namespace HookHub.Core.Workers
             _logger.LogInformation("The Hook has been terminated");
         }
             
+        /// <summary>
+        /// Starts the hook service and establishes connection.
+        /// </summary>
+        /// <returns>A task representing the asynchronous operation.</returns>
         public async Task Start()
         {
             _logger.LogInformation("Initializing the Hook...");

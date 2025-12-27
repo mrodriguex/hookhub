@@ -8,24 +8,51 @@ using System.Text;
 
 namespace HookHub.Hub.Controllers
 {
+    /// <summary>
+    /// API controller that acts as a proxy for forwarding HTTP requests to connected hooks.
+    /// Routes incoming requests to specific hook destinations based on user key.
+    /// </summary>
     [ApiController]
     [Route("[controller]")]
     public class ProxyController : Controller
     {
+        /// <summary>
+        /// Logger for logging proxy operations and errors.
+        /// </summary>
         private readonly ILogger<ProxyController> _logger;
+
+        /// <summary>
+        /// The background worker managing the hub and hook connections.
+        /// </summary>
         public Worker Worker { get; set; }
 
+        /// <summary>
+        /// Constructor. Injects the Worker and logger dependencies.
+        /// </summary>
+        /// <param name="worker">The Worker instance managing the hub.</param>
+        /// <param name="logger">The logger for logging operations.</param>
         public ProxyController(Worker worker, ILogger<ProxyController> logger)
         {
             Worker = worker;
             _logger = logger;
         }
 
+        /// <summary>
+        /// Displays the proxy index page.
+        /// </summary>
+        /// <returns>The proxy view.</returns>
         public IActionResult Index()
         {
             return View();
         }
 
+        /// <summary>
+        /// Proxies HTTP requests (GET, POST, PUT, DELETE) to a specific hook destination.
+        /// Constructs a HookWebRequest from the incoming request and forwards it via the hub.
+        /// </summary>
+        /// <param name="claveUsuarioDestino">The destination user key for the hook.</param>
+        /// <param name="proxedUrl">The URL to proxy the request to.</param>
+        /// <returns>The response from the hook or an error result.</returns>
         [HttpGet("{claveUsuarioDestino}/{*proxedUrl}"),
             HttpPost("{claveUsuarioDestino}/{*proxedUrl}"),
             HttpPut("{claveUsuarioDestino}/{*proxedUrl}"),
@@ -117,6 +144,13 @@ namespace HookHub.Hub.Controllers
             return actionResult;
         }
 
+        /// <summary>
+        /// Sends a request to the specified hook destination via the hub.
+        /// </summary>
+        /// <param name="claveUsuarioDestino">The destination user key.</param>
+        /// <param name="request">The request object to send.</param>
+        /// <param name="requestType">The type of the request.</param>
+        /// <returns>The hook web response from the destination.</returns>
         private async Task<HookWebResponse> EnviarMensajeHook(string claveUsuarioDestino, object request, NetType requestType = NetType.HttpRequestMessage)
         {
             HookWebResponse hookWebResponse = new HookWebResponse();
@@ -136,8 +170,16 @@ namespace HookHub.Hub.Controllers
         }
     }
     
+    /// <summary>
+    /// Extension methods for HttpRequestMessage to support cloning.
+    /// </summary>
     public static class HttpRequestMessageExtensions
     {
+        /// <summary>
+        /// Clones an HttpRequestMessage asynchronously, including headers, content, and properties.
+        /// </summary>
+        /// <param name="req">The original HttpRequestMessage to clone.</param>
+        /// <returns>A cloned HttpRequestMessage.</returns>
         public static async Task<HttpRequestMessage> CloneHttpRequestMessageAsync(HttpRequestMessage req)
         {
             var clone = new HttpRequestMessage(req.Method, req.RequestUri);
@@ -170,15 +212,31 @@ namespace HookHub.Hub.Controllers
         }
     }
 
+    /// <summary>
+    /// ActionResult implementation that returns an HttpResponseMessage.
+    /// Allows MVC actions to return HttpResponseMessage directly.
+    /// </summary>
     public class HttpResponseMessageResult : IActionResult
     {
+        /// <summary>
+        /// The HttpResponseMessage to return.
+        /// </summary>
         private readonly HttpResponseMessage _responseMessage;
 
+        /// <summary>
+        /// Constructor. Initializes the result with the response message.
+        /// </summary>
+        /// <param name="responseMessage">The HttpResponseMessage to return.</param>
         public HttpResponseMessageResult(HttpResponseMessage responseMessage)
         {
             _responseMessage = responseMessage; // could add throw if null
         }
 
+        /// <summary>
+        /// Executes the result asynchronously, copying the response to the HTTP context.
+        /// </summary>
+        /// <param name="context">The action context.</param>
+        /// <returns>A task representing the asynchronous operation.</returns>
         public async Task ExecuteResultAsync(ActionContext context)
         {
             context.HttpContext.Response.StatusCode = (int)_responseMessage.StatusCode;
