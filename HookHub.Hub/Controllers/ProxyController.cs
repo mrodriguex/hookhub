@@ -3,7 +3,7 @@ using HookHub.Core.Models;
 using HookHub.Core.Workers;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Primitives;
-
+using System.Net;
 using System.Text;
 
 namespace HookHub.Hub.Controllers
@@ -92,7 +92,7 @@ namespace HookHub.Hub.Controllers
                     }
                 }
 
-                HookWebResponse hookWebResponse = EnviarMensajeHook(claveUsuarioDestino, hookWebRequest, NetType.HttpRequestMessage).Result;
+                HookWebResponse hookWebResponse = SendMessageToHook(claveUsuarioDestino, hookWebRequest).Result;
 
                 if (hookWebResponse is not null)
                 {
@@ -127,6 +127,7 @@ namespace HookHub.Hub.Controllers
                     }
                     catch (Exception ex)
                     {
+                        _logger.LogError(ex.Message);
                         actionResult = BadRequest($"{ex.Message}: {hookWebResponse.Content.ToString()}");
                     }
                 }
@@ -151,25 +152,27 @@ namespace HookHub.Hub.Controllers
         /// <param name="request">The request object to send.</param>
         /// <param name="requestType">The type of the request.</param>
         /// <returns>The hook web response from the destination.</returns>
-        private async Task<HookWebResponse> EnviarMensajeHook(string claveUsuarioDestino, object request, NetType requestType = NetType.HttpRequestMessage)
+        private async Task<HookWebResponse> SendMessageToHook(string claveUsuarioDestino, HookWebRequest request)
         {
             HookWebResponse hookWebResponse = new HookWebResponse();
+            hookWebResponse.Content = Encoding.UTF8.GetBytes(string.Empty);
+            hookWebResponse.StatusCode = HttpStatusCode.InternalServerError;
+            hookWebResponse.IsSuccessStatusCode = false;
+            hookWebResponse.ReasonPhrase = string.Empty;
+
             try
             {
-                hookWebResponse = await Worker.Hook.SendRequest(hookNameTo: claveUsuarioDestino, request: request, requestType: requestType) as HookWebResponse;
+                hookWebResponse = await Worker.Hook.SendRequest(hookNameTo: claveUsuarioDestino, request: request);
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex.Message);
-                hookWebResponse.Content = ex.Message != null ? Encoding.UTF8.GetBytes(ex.Message) : new byte[0];
-                hookWebResponse.StatusCode = 500;
-                hookWebResponse.IsSuccessStatusCode = false;
-                hookWebResponse.ReasonPhrase = ex.Message;                
+                hookWebResponse.ReasonPhrase = ex.Message ?? string.Empty;
             }
             return (hookWebResponse);
         }
     }
-    
+
     /// <summary>
     /// Extension methods for HttpRequestMessage to support cloning.
     /// </summary>

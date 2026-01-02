@@ -20,16 +20,6 @@ namespace HookHub.Core.Models
         private string _pathBase;
         private string _path;
 
-        //public string QueryString
-        //{
-        //    get
-        //    {
-        //        _queryString ??= "";
-        //        return (_queryString);
-        //    }
-        //    set { _queryString = value; }
-        //}
-
         /// <summary>
         /// Gets or sets the headers as a dictionary of header names to lists of values.
         /// </summary>

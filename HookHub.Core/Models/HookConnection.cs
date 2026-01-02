@@ -6,10 +6,11 @@
     public class HookConnection
     {
 
-        int _timeIntervals_KeepAlive;
-
+        private int _timeIntervals_KeepAlive;
+        private int _timeIntervals_TimeOutResponse;
         private string _hookName = default!;
         private string _connectionId = default!;
+        private string _hookHubNetURL = default!;
 
         /// <summary>
         /// Gets or sets the keep-alive interval in milliseconds. Minimum value is 60000 (1 minute).
@@ -60,18 +61,24 @@
             get;
             set;
         } = DateTime.UtcNow;
-
-        /// <summary>
-        /// Gets a value indicating whether the connection has timed out based on the keep-alive interval.
-        /// </summary>
-        public bool IsTimedOut
+        public int TimeIntervals_TimeOutResponse
         {
             get
             {
-                DateTime nowTimeOut = LastKeepAlive.AddMilliseconds(TimeIntervals_KeepAlive);
-                return (DateTime.UtcNow.CompareTo(nowTimeOut) > 0);
+                return Math.Max(_timeIntervals_TimeOutResponse, 10000);
+            }
+            set
+            {
+                _timeIntervals_TimeOutResponse = Math.Max(value, 10000);
             }
         }
 
+        public string HookHubNetURL { 
+            get
+            {
+                _hookHubNetURL ??= "";
+                return (_hookHubNetURL);
+            }
+            set { _hookHubNetURL = value; } }
     }
 }

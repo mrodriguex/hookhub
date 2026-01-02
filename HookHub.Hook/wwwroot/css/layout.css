@@ -1,0 +1,8 @@
+﻿body {
+    padding-top: 4.5rem;    /* navbar height */
+    padding-bottom: 3.5rem; /* footer height */
+}
+
+#loadingOverlay {
+    backdrop-filter: blur(2px);
+}

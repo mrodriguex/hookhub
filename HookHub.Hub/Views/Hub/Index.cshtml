@@ -1,66 +1,139 @@
 ﻿@model HookHub.Hub.Models.CoreHookInfoModel
 
-    <style>
+<style>
+    body {
+        background: #f5f7fa;
+    }
 
-        .pre-scrollable {
-            max-height: calc(100vh - 145px);
-        }
+    /* Layout */
+    .panel {
+        height: calc(100vh - 200px);
+        overflow-y: auto;
+    }
 
-        .controles {
-            height: calc(100vh - 145px);
-        }
+    /* Grid */
+    .client-grid table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 0.9rem;
+    }
 
-    </style>
+    .client-grid th {
+        text-align: left;
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        color: #6c757d;
+        border-bottom: 1px solid #dee2e6;
+        padding: 8px;
+    }
 
-    <div class="container">
-        <div class="row">&nbsp;&nbsp;</div>
-        <div class="row">
+    .client-grid td {
+        padding: 8px;
+        border-bottom: 1px solid #e9ecef;
+    }
 
-            <div class="col-lg-5 pre-scrollable">
-                <ul id="listUsers"></ul>
-            </div>
+    .client-grid tr:hover {
+        background: #eef2f7;
+        cursor: pointer;
+    }
 
-            <div class="col-lg-5 pre-scrollable">
-                <ul id="listMessage"></ul>
-            </div>
+    /* Message log */
+    .log-box {
+        background: #0e1117;
+        color: #d1d5db;
+        font-family: Consolas, monospace;
+        font-size: 0.85rem;
+        padding: 10px;
+        border-radius: 8px;
+    }
 
-            <div class="col-lg-2 controles">
-                <div class="row">
-                    <div class="col-12">
-                        <input type="button" id="btnRefreshUsers" value="Refresh" />
+    .log-box ul {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+
+    .log-box li {
+        padding: 4px 0;
+        border-bottom: 1px dashed #30363d;
+    }
+
+    /* Hidden control panel */
+    .controls-hidden {
+        display: none;
+    }
+</style>
+
+<div class="container-fluid mt-4">
+    <div class="row g-3">
+
+        <!-- CONNECTED CLIENTS GRID -->
+        <div class="col-lg-4">
+            <div class="card shadow-sm h-100">
+                <div class="card-body panel client-grid">
+
+                    <div class="mb-2">
+                        <input type="text"
+                               id="clientFilter"
+                               class="form-control form-control-sm"
+                               placeholder="Filter clients..." />
                     </div>
-                </div>
-                <div class="row">&nbsp;&nbsp;</div>
-                <div class="row">
-                    <div class="col-2">HubPath: </div>
-                    <div class="col-4"><input type="text" id="url" value="@Url.Content("~/HOOKHUBNET")" /></div>
-                </div>
-                <div class="row">
-                    <div class="col-2">From user Name: </div>
-                    <div class="col-4"><input type="text" id="hookNameFrom" value="@(Model.HookConnection.HookName)" /></div>
-                </div>
-                <div class="row">
-                    <div class="col-2">To user Name: </div>
-                    <div class="col-4"><input type="text" id="hookNameTo" value="@(Model.HookConnection.HookName)" /></div>
-                </div>
-                <div class="row">
-                    <div class="col-2">Message</div>
-                    <div class="col-4"><input type="text" id="message" value="message" /></div>
-                </div>
-                <div class="row">&nbsp;&nbsp;</div>
-                <div class="row">
-                    <div class="col-6">
-                        <input type="button" id="btnConnect" value="Connect" />
-                    </div>
-                    <div class="col-6">
-                        <input type="button" id="btnSend" value="Send" />
-                    </div>
+
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Client</th>
+                            </tr>
+                        </thead>
+                        <tbody id="listUsers">
+                            <!-- JS fills rows -->
+                        </tbody>
+                    </table>
+
                 </div>
             </div>
-
         </div>
-    </div>
 
-    @*<script src="~/js/jquery-3.3.1.min.js"></script>*@
-    <script src="~/js/signalr.min.js"></script>
-    <script src="~/js/hub.js"></script>
+        <!-- MESSAGE LOG -->
+        <div class="col-lg-8">
+            <div class="card shadow-sm h-100">
+                <div class="card-body panel log-box">
+                    <ul id="listMessage"></ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- INVISIBLE CONTROLS -->
+        <div class="controls-hidden">
+            <input type="button" id="btnRefreshUsers" />
+            <input type="button" id="btnConnect" />
+            <input type="button" id="btnSend" />
+
+            <input type="text" id="url" readonly value="@Url.Content("~/HOOKHUBNET")" />
+            <input type="text" id="hookNameFrom" readonly value="@(Model.HookConnection.HookName)" />
+            <input type="text" id="hookNameTo" readonly value="@(Model.HookConnection.HookName)" />
+            <input type="text" id="message" />
+        </div>
+
+    </div>
+</div>
+
+<script src="~/js/signalr.min.js"></script>
+<script src="~/js/hub.js"></script>
+
+<script>
+    document.getElementById("clientFilter")
+        .addEventListener("keyup", function () {
+            const filter = this.value.toLowerCase();
+            const rows = document.querySelectorAll("#listUsers tr");
+
+            rows.forEach(row => {
+                row.style.display =
+                    row.textContent.toLowerCase().includes(filter)
+                        ? ""
+                        : "none";
+            });
+        });
+</script>
+
+

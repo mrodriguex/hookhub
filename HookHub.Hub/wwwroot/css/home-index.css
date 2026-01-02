@@ -1,0 +1,64 @@
+.h-60 {
+    height: 30vh;
+    overflow-y: auto;
+}
+
+.h-40 {
+    height: 30vh;
+    overflow-y: auto;
+}
+
+
+.listMessage {
+    list-style: none;
+    padding-left: 0;
+    font-family: monospace;
+    font-size: 0.85rem;
+}
+
+.listMessage li {
+    padding: 2px 0;
+    border-bottom: 1px solid #eee;
+}
+
+.hookInfoTable td {
+    padding: 2px;
+}
+
+
+ /* Layout */
+    .panel {
+        height: calc(100vh - 200px);
+        overflow-y: auto;
+    }
+
+    /* Grid */
+    .client-grid table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 0.9rem;
+    }
+
+    .client-grid th {
+        text-align: left;
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        color: #6c757d;
+        border-bottom: 1px solid #dee2e6;
+        padding: 8px;
+    }
+
+    .client-grid td {
+        padding: 8px;
+        border-bottom: 1px solid #e9ecef;
+    }
+
+    .client-grid tr:hover {
+        background: #eef2f7;
+        cursor: pointer;
+    }
+
+    /* Hidden control panel */
+    .controls-hidden {
+        display: none;
+    }

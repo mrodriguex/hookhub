@@ -1,0 +1,16 @@
+.h-40 {
+    height: 20vh;
+    overflow-y: auto;
+}
+
+.listMessage {
+    list-style: none;
+    padding-left: 0;
+    font-family: monospace;
+    font-size: 0.85rem;
+}
+
+.listMessage li {
+    padding: 2px 0;
+    border-bottom: 1px solid #eee;
+}

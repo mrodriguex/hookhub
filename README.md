@@ -1,6 +1,6 @@
 # HookHub
 
-A comprehensive .NET-based real-time communication system built on ASP.NET Core and SignalR, enabling bidirectional messaging between multiple connected services (hooks) through a centralized hub.
+A distributed real-time communication platform built on ASP.NET Core and SignalR, enabling bidirectional messaging between multiple connected services (hooks) through a centralized hub.
 
 ## Table of Contents
 
@@ -165,7 +165,7 @@ HookHub/
 ### 1. Clone the Repository
 
 ```bash
-git clone https://gitlab.com/mrodriguex00/hookhub.git
+git clone https://gitlab.com/mrodriguex/hookhub.git
 cd hookhub
 ```
 
@@ -495,8 +495,8 @@ GetAllHookConnections()
 GetHookConnections(string hookName)
 
 // Send request/response messages
-SendRequest(NetMessage netMessage)
-SendResponse(NetMessage netMessage)
+SendRequest(HookNetRequest netMessage)
+SendResponse(HookNetRequest netMessage)
 ```
 
 ## API Documentation
@@ -663,7 +663,13 @@ This project is provided as-is. Ensure compliance with all included third-party 
 ## Support
 
 For issues, questions, or contributions, please refer to the project repository:
-https://gitlab.com/mrodriguex00/hookhub
+https://gitlab.com/mrodriguex/hookhub
+
+
+## Project Page
+
+You can find more information and documentation on the [HookHub Project Page](https://home.hookhub.app/).
+
 
 ---
 

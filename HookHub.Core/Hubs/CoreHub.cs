@@ -1,4 +1,5 @@
-﻿using HookHub.Core.Models;
+﻿using System.Net;
+using HookHub.Core.Models;
 using Microsoft.AspNetCore.SignalR;
 
 namespace HookHub.Core.Hubs
@@ -15,11 +16,6 @@ namespace HookHub.Core.Hubs
         private ILogger<CoreHub> _logger;
 
         /// <summary>
-        /// Indicates whether the hub has been disposed.
-        /// </summary>
-        public bool IsDisposed { get; private set; } = false;
-
-        /// <summary>
         /// Constructor. Initializes the hub with a logger.
         /// </summary>
         /// <param name="logger">The logger instance for logging.</param>
@@ -27,6 +23,20 @@ namespace HookHub.Core.Hubs
         {
             _logger = logger;
         }
+        /// <summary>
+        /// Gets the connection ID of the current hook.
+        /// </summary>
+        public string HookConnectionIdFrom => Context.ConnectionId;
+
+        /// <summary>
+        /// Gets the name of the current hook from the query string.
+        /// </summary>
+        public string? HookNameFrom => Context.GetHttpContext()?.Request?.Query["hookName"] ?? "HookHubNet";
+
+        /// <summary>
+        /// Indicates whether the hub has been disposed.
+        /// </summary>
+        public bool IsDisposed { get; private set; } = false;
 
         /// <summary>
         /// Broadcasts a message to all connected clients.
@@ -119,8 +129,8 @@ namespace HookHub.Core.Hubs
         /// <summary>
         /// Sends a response message to the originating hook.
         /// </summary>
-        /// <param name="netMessage">The NetMessage containing the response.</param>
-        public async Task SendResponse(NetMessage netMessage)
+        /// <param name="netMessage">The HookNetRequest containing the response.</param>
+        public async Task SendResponse(HookNetRequest netMessage)
         {
             try
             {
@@ -138,8 +148,8 @@ namespace HookHub.Core.Hubs
         /// <summary>
         /// Sends a request message to the target hook.
         /// </summary>
-        /// <param name="netMessage">The NetMessage containing the request.</param>
-        public async Task SendRequest(NetMessage netMessage)
+        /// <param name="netMessage">The HookNetRequest containing the request.</param>
+        public async Task SendRequest(HookNetRequest netMessage)
         {
             try
             {
@@ -155,7 +165,9 @@ namespace HookHub.Core.Hubs
                 }
                 else
                 {
-                    netMessage.Response = $"Error: The Hook {netMessage.HookConnectionTo.HookName} is not online.";
+                    netMessage.Response.StatusCode = HttpStatusCode.ServiceUnavailable;
+                    netMessage.Response.ReasonPhrase = $"Error: The Hook {netMessage.HookConnectionTo.HookName} is not online.";
+
                     await SendResponse(netMessage);
                 }
             }
@@ -175,16 +187,16 @@ namespace HookHub.Core.Hubs
         {
             try
             {
-                string connectionId = Context.ConnectionId;
-                string hookName = "";
-                if (HookConnetionsHub.HookConnections.TryRemove(connectionId, out hookName))
+                string? hookName = "";
+                if (HookConnetionsHub.HookConnections.TryRemove(HookConnectionIdFrom, out hookName))
                 {
-                    Task.Factory.StartNew(async () => await BroadcastMessage("HookHubNet", $"The Hook [{hookName}: {connectionId}] has been disconnected"));
-                };
+                    Task.Factory.StartNew(async () => await BroadcastMessage("HookHubNet", $"Hook [{hookName}] was disconnected (Connection ID: {HookConnectionIdFrom}"));
+                    _logger.LogInformation($"{DateTime.UtcNow:o} | [{HookNameFrom}] -> [HubHookNet] | [OnDisconnectedAsync]: Hook [{hookName}] was disconnected (Connection ID: {HookConnectionIdFrom}");
+                }
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex.Message);
+                _logger.LogError($"{DateTime.UtcNow:o} | [{HookNameFrom}] -> [HubHookNet] | [OnDisconnectedAsync]: {ex.Message}");
             }
             return base.OnDisconnectedAsync(exception);
         }
@@ -198,14 +210,11 @@ namespace HookHub.Core.Hubs
         {
             try
             {
-                var httpContext = Context.GetHttpContext();
-                string? hookName = httpContext?.Request?.Query["hookName"];
-                string connectionId = Context.ConnectionId;
-                await CheckForUserConection(connectionId, hookName??"Unknown Hook");
+                await CheckForUserConection(HookConnectionIdFrom, HookNameFrom ?? "Unknown Hook");
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex.Message);
+                _logger.LogError($"{DateTime.UtcNow:o} | [{HookNameFrom}] -> [HubHookNet] | [OnConnectedAsync]: {ex.Message}");
             }
             await base.OnConnectedAsync();
             return;
@@ -226,7 +235,7 @@ namespace HookHub.Core.Hubs
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex.Message);
+                _logger.LogError($"{DateTime.UtcNow:o} | [{HookNameFrom}] -> [HubHookNet] | [PurgeDisconnections]: {ex.Message}");
             }
             return;
         }
@@ -238,19 +247,20 @@ namespace HookHub.Core.Hubs
         /// <returns>The hook name that was purged, or empty string if not found.</returns>
         public async Task<string> PurgeDisconnection(string connectionId)
         {
-            string hookName = "";
+            string? hookName = "";
             try
             {
                 if (HookConnetionsHub.HookConnections.TryRemove(connectionId, out hookName))
                 {
-                    await BroadcastMessage("HookHubNet", $"The Hook [{hookName}: {connectionId}] has been purged");
+                    await BroadcastMessage("HookHubNet", $"The Hook [{hookName}] was purged (Connection ID: {connectionId})");
+                    _logger.LogInformation($"{DateTime.UtcNow:o} | [HubHookNet] -> [HubHookNet] | [PurgeDisconnection]: The Hook [{hookName}] was purged (Connection ID: {connectionId})");
                 }
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex.Message);
+                _logger.LogError($"{DateTime.UtcNow:o} | [HubHookNet] -> [HubHookNet] | [PurgeDisconnection]: {ex.Message}");
             }
-            return hookName;
+            return hookName ?? string.Empty;
         }
 
         /// <summary>
@@ -273,20 +283,21 @@ namespace HookHub.Core.Hubs
         {
             try
             {
-                string userDummy;
+                string? userDummy;
                 if (!HookConnetionsHub.HookConnections.TryGetValue(connectionId, out userDummy))
                 {
                     if (HookConnetionsHub.HookConnections.TryAdd(connectionId, hookName))
                     {
-                        await BroadcastMessage("HookHubNet", $"The Hook [{hookName}: {connectionId}] has been connected");
+                        await BroadcastMessage("HookHubNet", $"The Hook [{hookName}] was connected (Connection ID: {connectionId})");
+                        _logger.LogInformation($"{DateTime.UtcNow:o} | [{hookName}] -> [HubHookNet] | [CheckForUserConection]: The Hook [{hookName}] was connected (Connection ID: {connectionId})");
                     }
                 }
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex.Message);
+                _logger.LogError($"{DateTime.UtcNow:o} | [{hookName}] -> [HubHookNet] | [CheckForUserConection]: {ex.Message}");
             }
         }
-        
+
     }
 }

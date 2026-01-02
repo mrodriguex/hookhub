@@ -1,76 +1,57 @@
 @model HookHub.Core.Workers.Worker
+@section Scripts {
 
-<div class="container mt-5">
-    <div class="row">
+    <script>
+        window.hookHubConfig = {
+            apiUrl: '@Url.Action("Index", "Hook")',
+            hubUrl: '@Model.Hook.HookConnection.HookHubNetURL',
+            hookName: '@Model.Hook.HookConnection.HookName' + '-web'
+        };
+    </script>
+
+    <script src="~/js/home-index.js" asp-append-version="true"></script>
+    <script src="~/js/signalr.min.js" asp-append-version="true"></script>
+    <script src="~/js/hook.js" asp-append-version="true"></script>
+
+}
+
+<link rel="stylesheet" href="~/css/home-index.css" asp-append-version="true" />
+
+<div class="container-fluid">
+    <div class="row g-3">
         <div class="col-md-8 offset-md-2">
-            <h1>Worker Hook Information</h1>
+
+            <!-- ACTIONS -->
+            <div class="d-flex align-items-center justify-content-between flex-wrap gap-3">
+                <h5 class="mb-0">Actions</h5>
+
+                <div class="d-flex gap-2">
+                    <button class="btn btn-success" onclick="callHookAction('/Hook/Start')">Start Hook</button>
+                    <button class="btn btn-danger" onclick="callHookAction('/Hook/Stop')">Stop Hook</button>
+                    <button class="btn btn-warning" onclick="callHookAction('/Hook/Restart')">Restart Hook</button>
+                </div>
+            </div>
+
             <hr />
 
-            @if (Model != null && Model.Hook != null)
-            {
-                <div class="card">
-                    <div class="card-header">
-                        <h5 class="mb-0">Hook Details</h5>
-                    </div>
-                    <div class="card-body">
-                        <table class="table table-striped">
-                            <tr>
-                                <th>Property</th>
-                                <th>Value</th>
-                            </tr>
-                            <tr>
-                                <td><strong>Hook Name</strong></td>
-                                <td>@Model.Hook.HookConnection.HookName</td>
-                            </tr>
-                            <tr>
-                                <td><strong>Connection ID</strong></td>
-                                <td>@Model.Hook.HookConnection.ConnectionId</td>
-                            </tr>
-                            <tr>
-                                <td><strong>Hub URL</strong></td>
-                                <td>@Model.Hook.HookHubNetURL</td>
-                            </tr>
-                            <tr>
-                                <td><strong>Connection State</strong></td>
-                                <td>
-                                    <span class="badge @(Model.HubConnectionState.ToString() == "Connected" ? "badge-success" : "badge-danger")">
-                                        @Model.HubConnectionState
-                                    </span>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td><strong>Last Keep Alive</strong></td>
-                                <td>@Model.Hook.HookConnection.LastKeepAlive.ToString("G")</td>
-                            </tr>
-                            <tr>
-                                <td><strong>Keep Alive Interval (ms)</strong></td>
-                                <td>@Model.Hook.HookConnection.TimeIntervals_KeepAlive</td>
-                            </tr>
-                            <tr>
-                                <td><strong>Is Timed Out</strong></td>
-                                <td>
-                                    <span class="badge @(Model.Hook.HookConnection.IsTimedOut ? "badge-danger" : "badge-success")">
-                                        @Model.Hook.HookConnection.IsTimedOut
-                                    </span>
-                                </td>
-                            </tr>
-                        </table>
-                    </div>
-                </div>
+            <!-- HOOK INFO -->
+            <div class="card shadow-sm">
+                <table class="table table-striped align-middle mb-0">
+                    <tbody id="hookInfoTable">
+                        <!-- filled by JS -->
+                    </tbody>
+                </table>
+            </div>
 
-                <div class="mt-4">
-                    <h5>Actions</h5>
-                    <a href="~/Hook/Start" class="btn btn-success mr-2">Start Hook</a>
-                    <a href="~/Hook/Stop" class="btn btn-danger mr-2">Stop Hook</a>
-                    <a href="~/Hook/Restart" class="btn btn-warning">Restart Hook</a>
+            <hr />
+
+            <!-- MESSAGE LOG -->
+            <div class="card shadow-sm h-40">
+                <div class="card-body log-box">
+                    <ul id="listMessage" class="listMessage"></ul>
                 </div>
-            }
-            else
-            {
-                <div class="alert alert-warning" role="alert">
-                    No hook information available. The Worker service may not have initialized yet.
-                </div>
-            }
+            </div>
+
         </div>
     </div>
 </div>

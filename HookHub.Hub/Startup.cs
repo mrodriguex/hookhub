@@ -52,7 +52,30 @@ namespace HookHub.Hub
             });
 
             services.AddControllers();
-            services.AddCors();
+
+            services.AddCors(options =>
+            {
+                options.AddPolicy("HookHubCors", policy =>
+                {
+                    policy
+                        .SetIsOriginAllowed(origin =>
+                        {
+                            // ✅ allow https origins (internet clients)
+                            if (origin.StartsWith("https://"))
+                                return true;
+
+                            // ✅ allow localhost for dev
+                            if (origin.StartsWith("http://localhost"))
+                                return true;
+
+                            return false;
+                        })
+                        .AllowAnyHeader()
+                        .AllowAnyMethod()
+                        .AllowCredentials();
+                });
+            });
+
             services.AddOptions();
             services.AddRazorPages();
             services.AddSignalR();
@@ -68,9 +91,11 @@ namespace HookHub.Hub
                 options.MaximumReceiveMessageSize = null;
             });
 
+            var mvcBuilder = services.AddControllersWithViews();
 #if DEBUG
-            services.AddControllersWithViews();
+            mvcBuilder.AddRazorRuntimeCompilation();
 #endif
+
         }
 
         /// <summary>
@@ -96,16 +121,17 @@ namespace HookHub.Hub
                 app.UseDeveloperExceptionPage();
             }
 
-            app.UseCors(builder => builder.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader());
-
             app.UseRouting();
+
+            app.UseCors("HookHubCors");
+
             app.UseAuthorization();
-            
+
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllerRoute(
                     name: "default",
-                    pattern: "{controller=Hub}/{action=Index}");
+                    pattern: "{controller=Home}/{action=Index}");
                 endpoints.MapRazorPages();
                 endpoints.MapHub<CoreHub>("/HOOKHUBNET");
                 endpoints.MapControllers();

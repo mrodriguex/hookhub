@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Net;
-using System.Net.Http;
+﻿using System.Net;
 
 namespace HookHub.Core.Models
 {
@@ -21,7 +19,7 @@ namespace HookHub.Core.Models
             get
             {
                 _queryString ??= "";
-                return (_queryString);
+                return _queryString;
             }
             set { _queryString = value; }
         }
@@ -34,7 +32,7 @@ namespace HookHub.Core.Models
             get
             {
                 _headers ??= new Dictionary<string, List<string>>();
-                return (_headers);
+                return _headers;
             }
             set { _headers = value; }
         }
@@ -60,7 +58,7 @@ namespace HookHub.Core.Models
         /// <summary>
         /// Gets or sets the HTTP status code.
         /// </summary>
-        public int StatusCode { get; set; }
+        public HttpStatusCode StatusCode { get; set; }
 
         /// <summary>
         /// Gets or sets the reason phrase for the status code.

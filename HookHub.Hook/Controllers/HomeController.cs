@@ -29,6 +29,7 @@ namespace HookHub.Hook.Controllers
         /// <returns>The home view with the Worker model.</returns>
         public IActionResult Index()
         {
+            ViewData["Title"] = " - Hook Status";
             return View(_worker);
         }
     }

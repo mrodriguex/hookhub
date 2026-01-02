@@ -4,7 +4,6 @@ using HookHub.Core.Models;
 using Microsoft.AspNetCore.SignalR.Client;
 
 using System.Collections.Concurrent;
-using System.Threading.Tasks;
 
 namespace HookHub.Hub.Models
 {
@@ -18,67 +17,64 @@ namespace HookHub.Hub.Models
         /// Dictionary of connection responses keyed by some identifier.
         /// Used for tracking asynchronous responses from hook connections.
         /// </summary>
-        private ConcurrentDictionary<string, TaskCompletionSource<object>> _connectionResponses;
+        private ConcurrentDictionary<string, TaskCompletionSource<HookWebResponse>>? _connectionResponses;
 
         /// <summary>
         /// The URL of the hook hub network.
         /// </summary>
-        private string _cryoNETURL;
+        private string? _hookHubNetURL;
 
         /// <summary>
         /// The hook connection details.
         /// </summary>
-        private HookConnection _hookConnection;
+        private HookConnection? _hookConnection;
 
         /// <summary>
         /// Gets or sets the connection responses dictionary.
         /// Lazily initializes if null.
         /// </summary>
-        public ConcurrentDictionary<string, TaskCompletionSource<object>> ConnectionResponses {
-            get {
-                _connectionResponses ??= new ConcurrentDictionary<string, TaskCompletionSource<object>>();
-                return (_connectionResponses);
+        public ConcurrentDictionary<string, TaskCompletionSource<HookWebResponse>> ConnectionResponses
+        {
+            get
+            {
+                _connectionResponses ??= new ConcurrentDictionary<string, TaskCompletionSource<HookWebResponse>>();
+                return _connectionResponses;
             }
-            set {
+            set
+            {
                 _connectionResponses = value;
             }
         }
 
         /// <summary>
-        /// Default constructor.
-        /// </summary>
-        public CoreHookInfoModel()
-        {
-
-        }
-
-        /// <summary>
         /// Constructor that initializes the model from a CoreHook instance.
         /// </summary>
-        /// <param name="netClient">The CoreHook to copy data from.</param>
-        public CoreHookInfoModel(CoreHook netClient)
+        /// <param name="hook">The CoreHook to copy data from.</param>
+        public CoreHookInfoModel(CoreHook hook)
         {
-            CopyFrom(netClient);
+            CopyFrom(hook);
         }
 
         /// <summary>
         /// Gets or sets the hook hub network URL.
         /// </summary>
-        public string HookHubNetURL { get { return _cryoNETURL ?? ""; } set { _cryoNETURL = value; } }
+        public string HookHubNetURL { get { return _hookHubNetURL ?? ""; } set { _hookHubNetURL = value; } }
 
         /// <summary>
         /// The SignalR hub connection.
         /// </summary>
-        public HubConnection Connection { get; set; }
+        public HubConnection? Connection { get; set; }
 
         /// <summary>
         /// Gets or sets the hook connection details.
         /// Lazily initializes if null.
         /// </summary>
-        public HookConnection HookConnection {
-            get {
+        public HookConnection HookConnection
+        {
+            get
+            {
                 _hookConnection ??= new HookConnection();
-                return (_hookConnection);
+                return _hookConnection;
             }
             set { _hookConnection = value; }
         }
@@ -86,13 +82,13 @@ namespace HookHub.Hub.Models
         /// <summary>
         /// Copies data from a CoreHook instance to this model.
         /// </summary>
-        /// <param name="netClient">The CoreHook to copy from.</param>
-        public void CopyFrom(CoreHook netClient)
+        /// <param name="hook">The CoreHook to copy from.</param>
+        public void CopyFrom(CoreHook hook)
         {
-            ConnectionResponses = netClient.ConnectionResponses;
-            HookHubNetURL = netClient.HookHubNetURL;
-            Connection = netClient.Connection;
-            HookConnection = netClient.HookConnection;
+            ConnectionResponses = hook.ConnectionResponses;
+            HookHubNetURL = hook.HookConnection.HookHubNetURL;
+            Connection = hook.Connection;
+            HookConnection = hook.HookConnection;
         }
     }
 }

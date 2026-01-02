@@ -11,8 +11,7 @@ function OnClientReceiveBroadcast(hookNameFrom, message) {
     var li = document.createElement("li");
     li.textContent = displayMsg;
     var listMessage = document.getElementById("listMessage");
-    listMessage.insertBefore(li, listMessage.firstChild);
-    GetAllHookConnections();
+    listMessage.insertBefore(li, listMessage.firstChild);     
     loadHookInfo();
 }
 
@@ -24,14 +23,11 @@ function OnClientReceiveMessage(hookNameFrom, toUsername, message) {
     //document.getElementById("listMessage").appendChild(li);
     var listMessage = document.getElementById("listMessage");
     listMessage.insertBefore(li, listMessage.firstChild);
-    GetAllHookConnections();
-    loadHookInfo();
+    loadHookInfo();    
 }
 
 function OnStart() {
-    try {
-        var connectionId = connection.connectionId;
-        GetAllHookConnections();
+    try {     
         connection.on("OnClientReceiveBroadcast", OnClientReceiveBroadcast);
         connection.on("OnClientReceiveMessage", OnClientReceiveMessage);
     } catch (err) {
@@ -43,7 +39,7 @@ function OnStart() {
 /*********************************************************************/
 /*** ACTION METHODS **************************************************/
 /*********************************************************************/
-function Connect(url, hookNameFrom) {
+function Connect(url,hookNameFrom) {
     // Creating a connection to SignalR Hub
     connection = new signalR.HubConnectionBuilder().withUrl(url + "?hookName=" + hookNameFrom).build();
 
@@ -54,48 +50,7 @@ function Connect(url, hookNameFrom) {
     //event.preventDefault();
 }
 
-function SendMessage(event) {
-    var hookNameFrom = document.getElementById("hookNameFrom").value;
-    var hookNameTo = document.getElementById("hookNameTo").value;
-    var message = document.getElementById("message").value;
-    connection.invoke("SendMessage", hookNameFrom, hookNameTo, message).catch(function (err) {
-        return console.error(err.toString());
-    });
-    //event.preventDefault();
-}
-
-function GetAllHookConnections() {
-    connection.invoke("GetAllHookConnections")
-        .then(function (hookConnections) {
-            var numHookConnections = hookConnections.length;
-            $('#listUsers').empty();
-            var listUsers = document.getElementById("listUsers");
-            for (var i = 0; i < numHookConnections; i++) {
-                var hookConnection = hookConnections[i];
-                var li = document.createElement("li");
-                li.textContent = hookConnection.hookName + " :: " + hookConnection.connectionId;
-                listUsers.prepend(li);
-            }
-            sortList(listUsers);
-        })
-        .catch(function (err) {
-            return console.error(err.toString());
-        });
-
-    //event.preventDefault();
-}
 /*********************************************************************/
-
-/*********************************************************************/
-/*** OBJECT EVENT LISTENER ADDS **************************************/
-/*********************************************************************/
-// Connecting the Client to the Hub
-document.getElementById("btnConnect").addEventListener("click", Connect);
-// Sending the message from Client
-document.getElementById("btnSend").addEventListener("click", SendMessage);
-/*********************************************************************/
-
-
 
 function sortList(ul) {
     Array.from(ul.getElementsByTagName("LI"))
