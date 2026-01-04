@@ -63,24 +63,17 @@ namespace HookHub.Hub.Controllers
             try
             {
 
-                var requestQueryString = Request.QueryString.Value;
-                HttpRequestMessage httpRequestMessage = Request.ToHttpRequestMessage();
-
-                HookWebRequest hookWebRequest = new HookWebRequest();
-
-                _logger.LogInformation($"Proxying request to user key: {claveUsuarioDestino}, URL: {proxedUrl}{requestQueryString}");
-
-                if ((proxedUrl.StartsWith("http:/") && !proxedUrl.StartsWith("http://")) || (proxedUrl.StartsWith("https:/") && !proxedUrl.StartsWith("https://")))
-                {
-                    proxedUrl = proxedUrl.Replace("http:/", "http://").Replace("https:/", "https://");
-                }
-
-                hookWebRequest.HookUri = new Uri($"{proxedUrl}");
-                hookWebRequest.HubUri = new Uri($"{httpRequestMessage.RequestUri}".Replace($"{hookWebRequest.HookUri}", ""));
-                hookWebRequest.HttpMethod = httpRequestMessage.Method;  // GetHttpMethod( Request.Method);
-                hookWebRequest.Headers = Request.Headers.ToDictionary(a => a.Key, a => a.Value.AsEnumerable().ToList()); //hookWebResponse.Headers = response.Headers.ToDictionary(a => a.Key, a => a.Value);
-                hookWebRequest.Cookies = Request.Cookies.ToList();  // .ToDictionary(a => a.Key, a => a.Value.AsEnumerable().ToList()); //hookWebResponse.Headers = response.Headers.ToDictionary(a => a.Key, a => a.Value);
-
+                //var requestQueryString = Request.QueryString.Value;
+                      HttpRequestMessage httpRequestMessage = Request.ToHttpRequestMessage(proxedUrl);
+        
+        HookWebRequest hookWebRequest = new HookWebRequest();
+        
+        hookWebRequest.HookUri = httpRequestMessage.RequestUri; // Use from the message
+        hookWebRequest.HubUri = new Uri($"{Request.Scheme}://{Request.Host}{Request.PathBase}");
+        hookWebRequest.HttpMethod = httpRequestMessage.Method;
+        hookWebRequest.Headers = Request.Headers.ToDictionary(a => a.Key, a => a.Value.AsEnumerable().ToList());
+        hookWebRequest.Cookies = Request.Cookies.ToList();
+        
                 string contentType = Request.ContentType;
 
                 hookWebRequest.Content.Headers = Request.Headers.ToDictionary(a => a.Key, a => a.Value.AsEnumerable().ToList());
