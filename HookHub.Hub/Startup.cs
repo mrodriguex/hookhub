@@ -135,6 +135,11 @@ namespace HookHub.Hub
                 endpoints.MapRazorPages();
                 endpoints.MapHub<CoreHub>("/HOOKHUBNET");
                 endpoints.MapControllers();
+                // Add a catch-all for root
+                endpoints.MapGet("/", async context =>
+                {
+                    context.Response.Redirect("/home/index");
+                });
             });
 
             logger.LogInformation("Application pipeline configured successfully");
