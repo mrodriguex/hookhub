@@ -6,6 +6,7 @@ A distributed real-time communication platform built on ASP.NET Core and SignalR
 
 - [Overview](#overview)
 - [Features](#features)
+- [Website & Documentation](#website--documentation)
 - [Project Structure](#project-structure)
 - [Prerequisites](#prerequisites)
 - [Installation](#installation)
@@ -46,6 +47,23 @@ HookHub is a distributed communication platform that allows multiple services (c
 - **Connection Purging**: Remove stale or timed-out connections automatically
 - **REST API Endpoints**: Query hook connections and perform administrative operations
 - **Hook Control Interface**: Start, stop, and restart hooks from the web interface
+
+## Website & Documentation
+
+HookHub includes a comprehensive landing page (`/index.html`) that serves as both a project showcase and interactive documentation hub:
+
+### Landing Page Features
+- **Professional Design**: Modern, responsive design with dark blue branding
+- **Live Demo Access**: Direct links to preview the running application
+- **Interactive Examples**: Code snippets for SignalR messaging and API proxy usage
+- **Step-by-Step Setup Guide**: Detailed installation and configuration instructions
+- **Architecture Overview**: Visual representation of the distributed system design
+- **Use Cases**: Real-world scenarios and implementation examples
+
+### Key Pages
+- **Main Landing Page** (`/`): Complete project overview and getting started guide
+- **Hub Dashboard** (`/hub/index`): Real-time connection monitoring and management
+- **Testing Interface** (`/indexTesting.html`): Multi-instance communication testing
 
 ## Project Structure
 
@@ -104,7 +122,7 @@ HookHub/
 │   ├── Properties/
 │   │   └── launchSettings.json
 │   └── wwwroot/
-│       ├── index.html                   # Real-time communication test page
+│       ├── index.html                   # Project landing page with documentation and live demos
 │       ├── indexTesting.html            # Multi-instance monitoring page
 │       ├── css/                         # Stylesheets
 │       ├── js/
@@ -112,10 +130,10 @@ HookHub/
 │       │   ├── signalr.min.js           # SignalR client library
 │       │   └── jquery-3.3.1.min.js      # jQuery library
 │       ├── lib/bootstrap/               # Bootstrap framework
-│       └── images/                      # Static images
+│       └── images/                      # Static images and branding assets
 │
 │
-└── HookHub.Hook/                         # Alternative web interface
+└── HookHub.Hook/                         # Hook client service with web interface
     ├── HookHub.Hook.csproj
     ├── appsettings.json
     ├── appsettings.Development.json
@@ -146,11 +164,7 @@ HookHub/
 - Example hook client service demonstrating how to connect to the hub
 - Can be replicated for multiple hook instances
 - Configured to connect to the central hub
-
-**HookHub.Hook**
-- Additional web interface with Home and Hook controllers
-- Displays Worker.Hook information and connection status
-- Provides UI for hook management (Start, Stop, Restart)
+- Includes web interface for hook management (Start, Stop, Restart)
 
 ## Prerequisites
 
@@ -165,7 +179,7 @@ HookHub/
 ### 1. Clone the Repository
 
 ```bash
-git clone https://gitlab.com/mrodriguex/hookhub.git
+git clone https://github.com/mrodriguex/hookhub.git
 cd hookhub
 ```
 
@@ -326,6 +340,10 @@ dotnet run
 
 ## Usage
 
+### Getting Started
+1. Visit the landing page at `http://localhost:5100/` for a complete overview and setup guide
+2. Access the live preview at [hub.hookhub.app](https://hub.hookhub.app/) to see HookHub in action
+
 ### Web Dashboard
 
 1. Navigate to `http://localhost:5100/hub/index` in your browser
@@ -374,28 +392,28 @@ The ProxyController acts as a reverse proxy, routing HTTP requests from clients 
 
 **Endpoint Pattern:**
 ```
-{HTTP_METHOD} /Proxy/{HookNameTo}/{TargetUrl}
+{HTTP_METHOD} /Proxy/{HookNameTo}?proxedUrl={TargetUrl}
 ```
 
 **Parameters:**
-- `{HookNameTo}`: The destination hook name (e.g., `HookClientName`)
-- `{TargetUrl}`: The full URL to proxy to the hook service
+- `{HookNameTo}`: The destination hook name (e.g., `HookClientName`) - corresponds to `claveUsuarioDestino` in the implementation
+- `proxedUrl`: Query parameter containing the full URL to proxy to the hook service
 
 **Examples:**
 
 ```bash
 # Get hook status
-GET http://localhost:5100/Proxy/HookClientName/http://localhost:5200/hook/index
+GET http://localhost:5100/Proxy/HookClientName?proxedUrl=http://localhost:5200/hook/index
 
 # Post data to hook
-POST http://localhost:5100/Proxy/HookClientName/http://localhost:5200/api/data
+POST http://localhost:5100/Proxy/HookClientName?proxedUrl=http://localhost:5200/api/data
 Content-Type: application/json
 {
   "key": "value"
 }
 
 # Forward with query parameters
-GET http://localhost:5100/Proxy/HookClientName/http://localhost:5200/api/search?q=test&page=1
+GET http://localhost:5100/Proxy/HookClientName?proxedUrl=http://localhost:5200/api/search?q=test&page=1
 ```
 
 **Response Handling:**
@@ -592,8 +610,10 @@ public class HubController : Controller
 | Microsoft.AspNetCore.Mvc.NewtonsoftJson | 8.0.5 | JSON serialization |
 | Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation | 8.0.5 | Debug-time Razor compilation |
 | Microsoft.EntityFrameworkCore.SqlServer | 8.0.5 | SQL Server database support |
+| Microsoft.EntityFrameworkCore.Tools | 8.0.5 | Entity Framework tools |
 | Microsoft.Data.SqlClient | 5.2.1 | SQL Server connectivity |
 | Microsoft.Extensions.Hosting | 9.0.0 | Hosted services |
+| Microsoft.Extensions.Hosting.WindowsServices | 10.0.0 | Windows service hosting |
 | Newtonsoft.Json | 13.0.3 | JSON utilities |
 | FastMember.NetCore | 1.1.0 | Performance reflection utilities |
 | ncrontab | 3.3.3 | Cron expression support |
@@ -630,6 +650,21 @@ All projects use:
 - **Nullable Reference Types**: Enabled
 - **Documentation**: Comprehensive XML comments on all public members
 
+**HookHub.Core** (Library):
+- Output Type: Library
+- Dependencies: SignalR Client, Newtonsoft.Json
+
+**HookHub.Hub** (Web Application):
+- Output Type: Executable
+- Dependencies: Core library, Razor Runtime Compilation
+- Includes: Static web assets (CSS, JS, Images)
+
+**HookHub.Hook** (Web Application):
+- Output Type: Executable
+- Dependencies: Core library, Entity Framework, SQL Server, FastMember, ncrontab
+- Conditional: Razor Runtime Compilation (Debug only)
+- Includes: User Secrets for development
+
 ### Code Documentation Standards
 
 The codebase follows strict documentation standards:
@@ -663,7 +698,7 @@ This project is provided as-is. Ensure compliance with all included third-party 
 ## Support
 
 For issues, questions, or contributions, please refer to the project repository:
-https://gitlab.com/mrodriguex/hookhub
+https://github.com/mrodriguex/hookhub
 
 
 ## Project Page
@@ -673,6 +708,7 @@ You can find more information and documentation on the [HookHub Project Page](ht
 
 ---
 
-**Last Updated**: December 27, 2025
+**Last Updated**: January 3, 2026
 **Framework**: .NET 10.0
+**Author**: Manuel Rodriguez Camacho
 **License**: See individual component licenses
