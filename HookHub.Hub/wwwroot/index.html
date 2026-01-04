@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>HookHub — Secure Real-Time API Communication</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="icon" type="image/png" href="./images/HookHubFlag.png" />
+</head>
+<body class="bg-gray-50 text-gray-800">
+
+  <!-- Hero -->
+  <section class="bg-blue-950 py-20">
+    <div class="container mx-auto px-6 text-center">
+      <div class="flex justify-center items-center mb-4">
+        <img src="images/HookHubFlag.png" alt="HookHub Icon" class="w-16 h-16 mr-4">
+        <h1 class="text-4xl md:text-5xl font-bold text-white">
+          HookHub
+        </h1>
+      </div>
+      <p class="text-xl text-blue-100 mb-4">
+        A distributed real-time communication platform for services  
+        using ASP.NET Core and SignalR — reliable bidirectional messaging between connected "hooks."
+      </p>
+      <p class="text-lg text-blue-200 mb-8">
+        Enable seamless inter-service communication, event routing, and real-time dashboards with minimal configuration.
+      </p>
+      <div class="flex flex-col sm:flex-row justify-center gap-4">
+        <a href="https://github.com/mrodriguex/hookhub" target="_blank" class="bg-indigo-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-indigo-500 transition-colors">
+          View on GitHub
+        </a>
+        <a href="https://hub.hookhub.app/" target="_blank" class="bg-green-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-green-500 transition-colors">
+          🚀 Live Preview
+        </a>
+        <a href="#features" class="bg-white text-blue-900 px-6 py-3 rounded-lg font-semibold hover:bg-blue-50 transition-colors">
+          Learn More
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Features -->
+  <section id="features" class="py-16">
+    <div class="container mx-auto px-6">
+      <h2 class="text-3xl font-semibold text-center mb-12">Key Features</h2>
+      <div class="grid gap-12 lg:grid-cols-3">
+        <div class="bg-white p-8 rounded-lg shadow-lg text-center">
+          <div class="text-4xl mb-4">🔗</div>
+          <h3 class="text-2xl font-semibold mb-3">Reliable Messaging</h3>
+          <p class="mb-4">
+            Built on ASP.NET Core SignalR, HookHub enables robust WebSocket and Long Polling support with automatic reconnection and keep-alive mechanisms.
+          </p>
+          <img src="images/screenshot-messaging.png" alt="Messaging Screenshot Placeholder" class="w-full h-32 bg-gray-200 rounded-lg object-cover">
+        </div>
+        <div class="bg-white p-8 rounded-lg shadow-lg text-center">
+          <div class="text-4xl mb-4">🏢</div>
+          <h3 class="text-2xl font-semibold mb-3">Central Hub Routing</h3>
+          <p class="mb-4">
+            Multiple services (Hooks) connect to a central Hub for bidirectional communication and real-time message broadcasting.
+          </p>
+          <img src="images/screenshot-routing.png" alt="Routing Screenshot Placeholder" class="w-full h-32 bg-gray-200 rounded-lg object-cover">
+        </div>
+        <div class="bg-white p-8 rounded-lg shadow-lg text-center">
+          <div class="text-4xl mb-4">📊</div>
+          <h3 class="text-2xl font-semibold mb-3">Management API & Dashboard</h3>
+          <p class="mb-4">
+            Includes REST API endpoints for hook management and a web UI to view active connections and send test messages.
+          </p>
+          <img src="images/screenshot-dashboard.png" alt="Dashboard Screenshot Placeholder" class="w-full h-32 bg-gray-200 rounded-lg object-cover">
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Use Cases -->
+  <section class="bg-gray-100 py-16">
+    <div class="container mx-auto px-6">
+      <h2 class="text-3xl font-semibold text-center mb-12">Use Cases & Examples</h2>
+      <div class="grid gap-6 md:gap-8 lg:gap-12 grid-cols-1 md:grid-cols-1 lg:grid-cols-2">
+        <div class="bg-white p-6 rounded-lg shadow-lg">
+          <h3 class="text-xl font-semibold mb-3">Inter-Service Communication</h3>
+          <p class="text-gray-600 mb-4">
+            Enable microservices to communicate in real-time without direct dependencies.
+          </p>
+          <pre class="bg-gray-800 text-green-400 p-4 rounded text-sm overflow-x-auto"><code>// Example: Send message from one hook to another
+await hubConnection.InvokeAsync("SendToHook", "targetHookId", message);</code></pre>
+        </div>
+        <div class="bg-white p-6 rounded-lg shadow-lg">
+          <h3 class="text-xl font-semibold mb-3">Event Routing</h3>
+          <p class="text-gray-600 mb-4">
+            Route events across distributed systems for processing and notifications.
+          </p>
+          <pre class="bg-gray-800 text-green-400 p-4 rounded text-sm overflow-x-auto"><code>// Broadcast event to all connected hooks
+await hubConnection.InvokeAsync("BroadcastMessage", eventData);</code></pre>
+        </div>
+        <div class="bg-white p-6 rounded-lg shadow-lg">
+          <h3 class="text-xl font-semibold mb-3">Real-Time Dashboards</h3>
+          <p class="text-gray-600 mb-4">
+            Update dashboards instantly as data flows through your system.
+          </p>
+          <pre class="bg-gray-800 text-green-400 p-4 rounded text-sm overflow-x-auto"><code>// Receive updates in real-time
+hubConnection.On("ReceiveMessage", (message) => {
+  updateDashboard(message);
+});</code></pre>
+        </div>
+        <div class="bg-white p-6 rounded-lg shadow-lg">
+          <h3 class="text-xl font-semibold mb-3">API Proxy & Integration</h3>
+          <p class="text-gray-600 mb-4">
+            Proxy HTTP requests to connected hooks for seamless API integration.
+          </p>
+          <pre class="bg-gray-800 text-gray-100 p-4 rounded text-sm overflow-x-auto"><code># Get hook status
+GET /Proxy/HookClientName/http://localhost:5200/hook/index
+
+# Post data to hook
+POST /Proxy/HookClientName/http://localhost:5200/api/data
+Content-Type: application/json
+{
+  "key": "value"
+}</code></pre>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Architecture -->
+  <section class="py-16">
+    <div class="container mx-auto px-6 text-center">
+      <h2 class="text-3xl font-semibold mb-6">Architecture Overview</h2>
+      <p class="text-lg text-gray-700 mb-8 max-w-3xl mx-auto">
+        HookHub consists of a central Hub server that maintains persistent connections with multiple Hook clients. Messages are routed bidirectionally, ensuring reliable communication.
+      </p>
+      <img src="images/architecture-diagram.png" alt="Architecture Diagram Placeholder" class="w-full max-w-4xl mx-auto h-auto bg-gray-200 rounded-lg object-contain">
+    </div>
+  </section>
+
+  <!-- CTA & Contribute -->
+  <section class="py-16">
+    <div class="container mx-auto px-6">
+      <h3 class="text-3xl font-semibold text-center mb-4">Get Started</h3>
+      <p class="text-lg text-gray-700 text-center mb-12">
+        Follow these simple steps to get HookHub running on your system and start building real-time distributed applications.
+      </p>
+
+      <!-- Prerequisites -->
+      <div class="mb-12">
+        <h4 class="text-2xl font-semibold mb-6">Prerequisites</h4>
+        <div class="bg-blue-50 p-6 rounded-lg">
+          <p class="text-gray-700 mb-4">Before you begin, ensure you have:</p>
+          <ul class="list-disc list-inside text-gray-700 space-y-2">
+            <li><strong>.NET SDK 10.0 or later</strong> - Download from <a href="https://dotnet.microsoft.com/download" class="text-blue-600 hover:underline" target="_blank">microsoft.com</a></li>
+            <li><strong>Git</strong> - For cloning the repository</li>
+            <li><strong>Web browser</strong> - To access the dashboard and test interfaces</li>
+            <li><strong>Ports 5100 and 5200</strong> - Must be available on your system</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Step-by-Step Setup -->
+      <div class="mb-12">
+        <h4 class="text-2xl font-semibold mb-6">Step-by-Step Setup</h4>
+        <div class="grid gap-6 md:gap-8 lg:gap-12 grid-cols-1 md:grid-cols-1 lg:grid-cols-2">
+          <div class="bg-white p-6 rounded-lg shadow-lg">
+            <div class="flex items-center mb-4">
+              <div class="bg-indigo-600 text-white rounded-full w-8 h-8 flex items-center justify-center font-bold mr-3">1</div>
+              <h5 class="text-xl font-semibold">Clone the Repository</h5>
+            </div>
+            <p class="text-gray-600 mb-4">Open your terminal and clone the HookHub repository from GitHub.</p>
+            <pre class="bg-gray-800 text-gray-100 p-4 rounded-lg overflow-x-auto text-sm"><code>git clone https://github.com/mrodriguex/hookhub.git
+cd hookhub</code></pre>
+            <p class="text-sm text-gray-600 mt-2">This downloads all the source code and project files to your local machine.</p>
+          </div>
+
+          <div class="bg-white p-6 rounded-lg shadow-lg">
+            <div class="flex items-center mb-4">
+              <div class="bg-indigo-600 text-white rounded-full w-8 h-8 flex items-center justify-center font-bold mr-3">2</div>
+              <h5 class="text-xl font-semibold">Restore Dependencies</h5>
+            </div>
+            <p class="text-gray-600 mb-4">Install all required NuGet packages and dependencies.</p>
+            <pre class="bg-gray-800 text-gray-100 p-4 rounded-lg overflow-x-auto text-sm"><code>dotnet restore</code></pre>
+            <p class="text-sm text-gray-600 mt-2">This may take a minute as it downloads all the necessary libraries from NuGet.</p>
+          </div>
+
+          <div class="bg-white p-6 rounded-lg shadow-lg">
+            <div class="flex items-center mb-4">
+              <div class="bg-indigo-600 text-white rounded-full w-8 h-8 flex items-center justify-center font-bold mr-3">3</div>
+              <h5 class="text-xl font-semibold">Build the Project</h5>
+            </div>
+            <p class="text-gray-600 mb-4">Compile the source code to ensure everything is working correctly.</p>
+            <pre class="bg-gray-800 text-gray-100 p-4 rounded-lg overflow-x-auto text-sm"><code>dotnet build</code></pre>
+            <p class="text-sm text-gray-600 mt-2">If successful, you'll see "Build succeeded" in your terminal.</p>
+          </div>
+
+          <div class="bg-white p-6 rounded-lg shadow-lg">
+            <div class="flex items-center mb-4">
+              <div class="bg-indigo-600 text-white rounded-full w-8 h-8 flex items-center justify-center font-bold mr-3">4</div>
+              <h5 class="text-xl font-semibold">Run the Hub Server</h5>
+            </div>
+            <p class="text-gray-600 mb-4">Start the central Hub server that will manage all connections.</p>
+            <pre class="bg-gray-800 text-gray-100 p-4 rounded-lg overflow-x-auto text-sm"><code>dotnet run --project HookHub.Hub</code></pre>
+            <p class="text-sm text-gray-600 mt-2">The server will start on <code>http://localhost:5100</code>. Keep this terminal running.</p>
+          </div>
+
+          <div class="bg-white p-6 rounded-lg shadow-lg lg:col-span-2">
+            <div class="flex items-center mb-4">
+              <div class="bg-indigo-600 text-white rounded-full w-8 h-8 flex items-center justify-center font-bold mr-3">5</div>
+              <h5 class="text-xl font-semibold">Start a Hook Client (Optional)</h5>
+            </div>
+            <p class="text-gray-600 mb-4">In a new terminal, start a hook client to test the connection.</p>
+            <pre class="bg-gray-800 text-gray-100 p-4 rounded-lg overflow-x-auto text-sm"><code># In a new terminal window
+cd hookhub
+dotnet run --project HookHub.Hook</code></pre>
+            <p class="text-sm text-gray-600 mt-2">This starts a sample hook service on port 5200 that connects to the hub.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Using HookHub -->
+      <div class="mb-12">
+        <h4 class="text-2xl font-semibold mb-6">Using HookHub</h4>
+        <div class="grid gap-8 md:grid-cols-2">
+          <div class="bg-white p-6 rounded-lg shadow-lg">
+            <h5 class="text-xl font-semibold mb-4">Access the Dashboard</h5>
+            <p class="text-gray-700 mb-4">Open your web browser and navigate to the management dashboard.</p>
+            <p class="text-blue-600 font-semibold">http://localhost:5100/hub/index</p>
+            <p class="text-sm text-gray-600 mt-2">Here you can monitor connected hooks, send test messages, and view connection status.</p>
+          </div>
+          <div class="bg-white p-6 rounded-lg shadow-lg">
+            <h5 class="text-xl font-semibold mb-4">Test Real-Time Communication</h5>
+            <p class="text-gray-700 mb-4">Try the interactive testing page to see messages flow between hooks.</p>
+            <p class="text-blue-600 font-semibold">http://localhost:5100/indexTesting.html</p>
+            <p class="text-sm text-gray-600 mt-2">This page shows multiple instances for testing bidirectional messaging.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Next Steps -->
+      <div class="text-center">
+        <h4 class="text-2xl font-semibold mb-4">Next Steps</h4>
+        <p class="text-lg text-gray-700 mb-6">
+          Now that HookHub is running, explore the code, customize configurations, or start building your own hooks!
+        </p>
+        <a href="https://github.com/mrodriguex/hookhub" target="_blank" class="inline-block bg-indigo-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-indigo-700">
+          ⭐ Star on GitHub
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="bg-white py-6 mt-12 text-center text-sm text-gray-500">
+    <p class="mb-2">Built for open source developers • GPL-3.0 Licensed</p>
+    <p>Empower your distributed systems with reliable real-time communication.</p>
+  </footer>
+
+</body>
+</html>

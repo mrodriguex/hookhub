@@ -235,7 +235,7 @@ Example hook client configuration:
     "KeepAlive": "60000"
   },
   "HookNames": {
-    "HookNameFrom": "Hook-mrcamacho",
+    "HookNameFrom": "HookClientName",
     "HookNameTo": "HookHubNet"
   }
 }
@@ -378,24 +378,24 @@ The ProxyController acts as a reverse proxy, routing HTTP requests from clients 
 ```
 
 **Parameters:**
-- `{HookNameTo}`: The destination hook name (e.g., `Hook-mrcamacho`)
+- `{HookNameTo}`: The destination hook name (e.g., `HookClientName`)
 - `{TargetUrl}`: The full URL to proxy to the hook service
 
 **Examples:**
 
 ```bash
 # Get hook status
-GET http://localhost:5100/Proxy/Hook-mrcamacho/http://localhost:5200/hook/index
+GET http://localhost:5100/Proxy/HookClientName/http://localhost:5200/hook/index
 
 # Post data to hook
-POST http://localhost:5100/Proxy/Hook-mrcamacho/http://localhost:5200/api/data
+POST http://localhost:5100/Proxy/HookClientName/http://localhost:5200/api/data
 Content-Type: application/json
 {
   "key": "value"
 }
 
 # Forward with query parameters
-GET http://localhost:5100/Proxy/Hook-mrcamacho/http://localhost:5200/api/search?q=test&page=1
+GET http://localhost:5100/Proxy/HookClientName/http://localhost:5200/api/search?q=test&page=1
 ```
 
 **Response Handling:**
