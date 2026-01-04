@@ -53,11 +53,11 @@ namespace HookHub.Hub.Controllers
         /// <param name="claveUsuarioDestino">The destination user key for the hook.</param>
         /// <param name="proxedUrl">The URL to proxy the request to.</param>
         /// <returns>The response from the hook or an error result.</returns>
-        [HttpGet("{claveUsuarioDestino}/{*proxedUrl}"),
-            HttpPost("{claveUsuarioDestino}/{*proxedUrl}"),
-            HttpPut("{claveUsuarioDestino}/{*proxedUrl}"),
-            HttpDelete("{claveUsuarioDestino}/{*proxedUrl}")]
-        public ActionResult Proxy(string claveUsuarioDestino, string proxedUrl)
+        [HttpGet("{claveUsuarioDestino}"),
+            HttpPost("{claveUsuarioDestino}"),
+            HttpPut("{claveUsuarioDestino}"),
+            HttpDelete("{claveUsuarioDestino}")]
+        public ActionResult Proxy(string claveUsuarioDestino,[FromQuery] string proxedUrl)
         {
             ActionResult actionResult = NotFound();
             try
