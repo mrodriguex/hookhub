@@ -68,6 +68,8 @@ namespace HookHub.Hub.Controllers
 
                 HookWebRequest hookWebRequest = new HookWebRequest();
 
+                _logger.LogInformation($"Proxying request to user key: {claveUsuarioDestino}, URL: {proxedUrl}{requestQueryString}");
+
                 if ((proxedUrl.StartsWith("http:/") && !proxedUrl.StartsWith("http://")) || (proxedUrl.StartsWith("https:/") && !proxedUrl.StartsWith("https://")))
                 {
                     proxedUrl = proxedUrl.Replace("http:/", "http://").Replace("https:/", "https://");
