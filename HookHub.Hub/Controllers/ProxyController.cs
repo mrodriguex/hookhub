@@ -75,7 +75,7 @@ namespace HookHub.Hub.Controllers
                     proxedUrl = proxedUrl.Replace("http:/", "http://").Replace("https:/", "https://");
                 }
 
-                hookWebRequest.HookUri = new Uri($"{proxedUrl}{requestQueryString}");
+                hookWebRequest.HookUri = new Uri($"{proxedUrl}");
                 hookWebRequest.HubUri = new Uri($"{httpRequestMessage.RequestUri}".Replace($"{hookWebRequest.HookUri}", ""));
                 hookWebRequest.HttpMethod = httpRequestMessage.Method;  // GetHttpMethod( Request.Method);
                 hookWebRequest.Headers = Request.Headers.ToDictionary(a => a.Key, a => a.Value.AsEnumerable().ToList()); //hookWebResponse.Headers = response.Headers.ToDictionary(a => a.Key, a => a.Value);
